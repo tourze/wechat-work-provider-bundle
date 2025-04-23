@@ -4,7 +4,6 @@ namespace WechatWorkProviderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use DoctrineEnhanceBundle\Repository\CommonRepositoryAware;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
@@ -17,8 +16,6 @@ use WechatWorkProviderBundle\Entity\AuthCorp;
  */
 class AuthCorpRepository extends ServiceEntityRepository
 {
-    use CommonRepositoryAware;
-
     public function __construct(ManagerRegistry $registry, private readonly CorpRepository $corpRepository)
     {
         parent::__construct($registry, AuthCorp::class);

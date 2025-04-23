@@ -11,7 +11,6 @@ use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 use WechatWorkProviderBundle\Repository\SuiteRepository;
 use WechatWorkProviderBundle\Request\GetPermanentCodeRequest;
 use WechatWorkProviderBundle\Service\ProviderService;
-use Yiisoft\Arrays\ArrayHelper;
 
 #[AsEntityListener(event: Events::postPersist, method: 'autoCreateAuthCorp', entity: SuiteServerMessage::class)]
 class AuthCorpListener
@@ -30,7 +29,7 @@ class AuthCorpListener
     public function autoCreateAuthCorp(SuiteServerMessage $message): void
     {
         $msg = $message->getContext();
-        $InfoType = ArrayHelper::getValue($msg, 'InfoType');
+        $InfoType = $msg['InfoType'] ?? null;
 
         // 如果是授权接入 & 重置永久授权码
         if ('create_auth' === $InfoType || 'reset_permanent_code' === $InfoType) {

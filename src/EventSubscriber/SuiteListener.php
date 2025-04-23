@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
 use WechatWorkProviderBundle\Entity\SuiteServerMessage;
 use WechatWorkProviderBundle\Repository\SuiteRepository;
-use Yiisoft\Arrays\ArrayHelper;
 
 #[AsEntityListener(event: Events::postPersist, method: 'updateSuiteTicket', entity: SuiteServerMessage::class)]
 class SuiteListener
@@ -25,7 +24,7 @@ class SuiteListener
     public function updateSuiteTicket(SuiteServerMessage $message): void
     {
         $msg = $message->getContext();
-        $InfoType = ArrayHelper::getValue($msg, 'InfoType');
+        $InfoType = $msg['InfoType'] ?? null;
 
         if ('suite_ticket' === $InfoType) {
             $suite = $this->suiteRepository->findOneBy([

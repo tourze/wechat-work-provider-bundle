@@ -21,7 +21,7 @@ class PKCS7Encoder
     public function encode($text)
     {
         $block_size = PKCS7Encoder::$block_size;
-        $text_length = mb_strlen($text);
+        $text_length = strlen($text);
         // 计算需要填充的位数
         $amount_to_pad = PKCS7Encoder::$block_size - ($text_length % PKCS7Encoder::$block_size);
         if (0 == $amount_to_pad) {
@@ -40,17 +40,16 @@ class PKCS7Encoder
     /**
      * 对解密后的明文进行补位删除
      *
-     * @param decrypted 解密后的明文
-     *
-     * @return 删除填充补位后的明文
+     * @param string $text decrypted 解密后的明文
+     * @return string 删除填充补位后的明文
      */
     public function decode($text)
     {
-        $pad = ord(mb_substr($text, -1));
+        $pad = ord(substr($text, -1));
         if ($pad < 1 || $pad > PKCS7Encoder::$block_size) {
             $pad = 0;
         }
 
-        return mb_substr($text, 0, mb_strlen($text) - $pad);
+        return substr($text, 0, strlen($text) - $pad);
     }
 }

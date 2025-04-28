@@ -36,7 +36,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = '0';
+    private ?string $id = null;
 
     #[ListColumn]
     #[ORM\Column(length: 80, options: ['comment' => '授权方企业微信id'])]

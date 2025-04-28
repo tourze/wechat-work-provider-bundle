@@ -27,7 +27,7 @@
     "symfony/yaml": "^6.4 || ^7.1",
     "symfony/polyfill-php83": "^1.31",
     "tourze/http-client-bundle": "0.0.*",
-    "tourze/symfony-cron-job-bundle": "0.0.*",
+    "tourze/symfony-cron-job-bundle": "0.1.*",
     "tourze/doctrine-indexed-bundle": "0.0.*",
     "tourze/doctrine-snowflake-bundle": "0.0.*",
     "tourze/doctrine-timestamp-bundle": "0.0.*",

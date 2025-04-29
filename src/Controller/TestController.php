@@ -11,7 +11,7 @@ use WechatWorkBundle\Service\WorkService;
 use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 
 #[Route(path: '/wechat-work-provider/test')]
-class TestController extends \WechatWorkBundle\Controller\TestController
+class TestController extends \WechatWorkExternalContactBundle\Controller\TestController
 {
     public function __construct(
         CorpRepository $corpRepository,

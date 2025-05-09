@@ -24,6 +24,7 @@
     "symfony/http-foundation": "^6.4",
     "symfony/http-kernel": "^6.4",
     "symfony/polyfill-php83": "^1.31",
+    "symfony/routing": "^6.4",
     "symfony/serializer": "^6.4",
     "symfony/yaml": "^6.4 || ^7.1",
     "tourze/doctrine-indexed-bundle": "0.0.*",

@@ -4,7 +4,7 @@ namespace WechatWorkProviderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
-use WechatWorkBundle\Entity\Agent;
+use Tourze\WechatWorkContracts\AgentInterface;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
 
@@ -21,7 +21,7 @@ class AuthCorpRepository extends ServiceEntityRepository
         parent::__construct($registry, AuthCorp::class);
     }
 
-    public function getAgentByAuthCorp(AuthCorp $authCorp): ?Agent
+    public function getAgentByAuthCorp(AuthCorp $authCorp): ?AgentInterface
     {
         $corp = $this->corpRepository->findOneBy([
             'corpId' => $authCorp->getCorpId(),

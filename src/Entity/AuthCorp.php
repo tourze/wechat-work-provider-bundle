@@ -271,7 +271,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function setAuthInfo(?array $authInfo): self
     {
-        $this->authInfo = $authInfo;
+        $this->authInfo = $authInfo ?? [];
 
         return $this;
     }
@@ -283,7 +283,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function setAuthUserInfo(?array $authUserInfo): self
     {
-        $this->authUserInfo = $authUserInfo;
+        $this->authUserInfo = $authUserInfo ?? [];
 
         return $this;
     }
@@ -295,7 +295,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function setDealerCorpInfo(?array $dealerCorpInfo): self
     {
-        $this->dealerCorpInfo = $dealerCorpInfo;
+        $this->dealerCorpInfo = $dealerCorpInfo ?? [];
 
         return $this;
     }
@@ -307,7 +307,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function setRegisterCodeInfo(?array $registerCodeInfo): self
     {
-        $this->registerCodeInfo = $registerCodeInfo;
+        $this->registerCodeInfo = $registerCodeInfo ?? [];
 
         return $this;
     }

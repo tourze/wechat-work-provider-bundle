@@ -2,9 +2,9 @@
 
 namespace WechatWorkProviderBundle\Tests\Request;
 
+use HttpClientBundle\Request\ApiRequest;
 use PHPUnit\Framework\TestCase;
 use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
-use HttpClientBundle\Request\ApiRequest;
 
 class GetCorpTokenRequestTest extends TestCase
 {

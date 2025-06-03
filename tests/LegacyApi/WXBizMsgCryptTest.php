@@ -3,8 +3,8 @@
 namespace WechatWorkProviderBundle\Tests\LegacyApi;
 
 use PHPUnit\Framework\TestCase;
-use WechatWorkProviderBundle\LegacyApi\WXBizMsgCrypt;
 use WechatWorkProviderBundle\LegacyApi\ErrorCode;
+use WechatWorkProviderBundle\LegacyApi\WXBizMsgCrypt;
 
 class WXBizMsgCryptTest extends TestCase
 {

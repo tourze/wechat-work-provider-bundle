@@ -3,10 +3,10 @@
 namespace WechatWorkProviderBundle\Tests\Entity;
 
 use PHPUnit\Framework\TestCase;
-use WechatWorkProviderBundle\Entity\AuthCorp;
-use WechatWorkProviderBundle\Entity\Suite;
-use WechatWorkProviderBundle\Entity\CorpServerMessage;
 use WechatWorkBundle\Entity\AccessTokenAware;
+use WechatWorkProviderBundle\Entity\AuthCorp;
+use WechatWorkProviderBundle\Entity\CorpServerMessage;
+use WechatWorkProviderBundle\Entity\Suite;
 
 class AuthCorpTest extends TestCase
 {

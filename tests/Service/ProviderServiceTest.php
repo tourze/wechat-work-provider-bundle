@@ -2,26 +2,16 @@
 
 namespace WechatWorkProviderBundle\Tests\Service;
 
-use PHPUnit\Framework\TestCase;
-use PHPUnit\Framework\MockObject\MockObject;
 use Doctrine\ORM\EntityManagerInterface;
-use Carbon\Carbon;
-use Symfony\Contracts\HttpClient\ResponseInterface;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
-use WechatWorkProviderBundle\Entity\Provider;
-use WechatWorkProviderBundle\Entity\Suite;
 use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 use WechatWorkProviderBundle\Repository\SuiteRepository;
-use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
-use WechatWorkProviderBundle\Request\GetProviderTokenRequest;
-use WechatWorkProviderBundle\Request\GetSuiteTokenRequest;
-use WechatWorkProviderBundle\Request\WithAuthCorpRequest;
-use WechatWorkProviderBundle\Request\WithProviderRequest;
-use WechatWorkProviderBundle\Request\WithSuiteRequest;
 use WechatWorkProviderBundle\Service\ProviderService;
 
 class ProviderServiceTest extends TestCase

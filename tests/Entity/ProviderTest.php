@@ -4,8 +4,8 @@ namespace WechatWorkProviderBundle\Tests\Entity;
 
 use PHPUnit\Framework\TestCase;
 use WechatWorkProviderBundle\Entity\Provider;
-use WechatWorkProviderBundle\Entity\Suite;
 use WechatWorkProviderBundle\Entity\ProviderServerMessage;
+use WechatWorkProviderBundle\Entity\Suite;
 
 class ProviderTest extends TestCase
 {

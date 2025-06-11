@@ -25,7 +25,7 @@ class XMLParse
             $encrypt = $array_e->item(0)->nodeValue;
 
             return [0, $encrypt];
-        } catch  (\Throwable $e) {
+        } catch (\Throwable $e) {
             echo $e . "\n";
 
             return [ErrorCode::$ParseXmlError, null];

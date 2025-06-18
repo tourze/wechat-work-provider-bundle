@@ -8,11 +8,6 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use WechatWorkBundle\Entity\AccessTokenAware;
 use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 
@@ -21,26 +16,20 @@ use WechatWorkProviderBundle\Repository\AuthCorpRepository;
  *
  * @see https://developer.work.weixin.qq.com/document/path/90603
  */
-#[Editable]
-#[Deletable]
 #[ORM\Entity(repositoryClass: AuthCorpRepository::class)]
 #[ORM\Table(name: 'wechat_work_provider_auth_corp', options: ['comment' => '授权方公司'])]
 class AuthCorp implements AccessTokenAware, \Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn]
     #[ORM\Column(length: 80, options: ['comment' => '授权方企业微信id'])]
     private ?string $corpId = null;
 
-    #[ListColumn]
     #[ORM\Column(length: 120, options: ['comment' => '授权方企业简称'])]
     private ?string $corpName = null;
 
@@ -95,13 +84,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
     #[ORM\ManyToOne(inversedBy: 'authCorps')]
     private ?Suite $suite = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => '代开发Token'])]
     private ?string $token = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 120, nullable: true, options: ['comment' => '代开发EncodingAESKey'])]
     private ?string $encodingAesKey = null;
 

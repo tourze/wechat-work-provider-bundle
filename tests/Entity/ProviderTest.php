@@ -191,7 +191,7 @@ class ProviderTest extends TestCase
 
     public function testCreateTimeGetterAndSetter(): void
     {
-        $createTime = new \DateTime('2024-01-01 08:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 08:00:00');
         $this->provider->setCreateTime($createTime);
         $this->assertSame($createTime, $this->provider->getCreateTime());
         
@@ -202,7 +202,7 @@ class ProviderTest extends TestCase
 
     public function testUpdateTimeGetterAndSetter(): void
     {
-        $updateTime = new \DateTime('2024-01-01 09:30:00');
+        $updateTime = new \DateTimeImmutable('2024-01-01 09:30:00');
         $this->provider->setUpdateTime($updateTime);
         $this->assertSame($updateTime, $this->provider->getUpdateTime());
         
@@ -236,11 +236,11 @@ class ProviderTest extends TestCase
         $this->assertSame('test_corp', $this->provider->getCorpId());
         
         // setCreateTime 和 setUpdateTime 也返回 void
-        $createTime = new \DateTime();
+        $createTime = new \DateTimeImmutable();
         $this->provider->setCreateTime($createTime);
         $this->assertSame($createTime, $this->provider->getCreateTime());
         
-        $updateTime = new \DateTime();
+        $updateTime = new \DateTimeImmutable();
         $this->provider->setUpdateTime($updateTime);
         $this->assertSame($updateTime, $this->provider->getUpdateTime());
     }

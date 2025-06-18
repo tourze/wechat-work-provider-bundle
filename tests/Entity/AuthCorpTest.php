@@ -277,7 +277,7 @@ class AuthCorpTest extends TestCase
 
     public function testCreateTimeGetterAndSetter(): void
     {
-        $createTime = new \DateTime('2024-01-01 10:00:00');
+        $createTime = new \DateTimeImmutable('2024-01-01 10:00:00');
         $this->authCorp->setCreateTime($createTime);
         $this->assertSame($createTime, $this->authCorp->getCreateTime());
         
@@ -288,7 +288,7 @@ class AuthCorpTest extends TestCase
 
     public function testUpdateTimeGetterAndSetter(): void
     {
-        $updateTime = new \DateTime('2024-01-01 10:30:00');
+        $updateTime = new \DateTimeImmutable('2024-01-01 10:30:00');
         $this->authCorp->setUpdateTime($updateTime);
         $this->assertSame($updateTime, $this->authCorp->getUpdateTime());
         

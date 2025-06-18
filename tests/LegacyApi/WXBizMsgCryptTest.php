@@ -92,8 +92,6 @@ class WXBizMsgCryptTest extends TestCase
         
         $this->assertSame(ErrorCode::$OK, $result);
         $this->assertNotEmpty($sEncryptMsg);
-        $this->assertIsString($sEncryptMsg);
-        
         // 验证生成的是XML格式
         $this->assertStringContainsString('<xml>', $sEncryptMsg);
         $this->assertStringContainsString('<Encrypt>', $sEncryptMsg);

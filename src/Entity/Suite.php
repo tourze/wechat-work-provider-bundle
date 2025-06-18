@@ -8,32 +8,19 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use WechatWorkProviderBundle\Repository\SuiteRepository;
 
-#[Creatable]
-#[Editable]
-#[Deletable]
 #[ORM\Entity(repositoryClass: SuiteRepository::class)]
 #[ORM\Table(name: 'wechat_work_provider_suite', options: ['comment' => '代开发应用模板'])]
 class Suite implements \Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn(title: '服务商')]
-    #[FormField(title: '服务商')]
     #[ORM\ManyToOne(inversedBy: 'suites')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Provider $provider = null;
@@ -41,46 +28,30 @@ class Suite implements \Stringable
     /**
      * @var string|null 第三方应用id或者代开发应用模板id。第三方应用以ww或wx开头应用id（对应于旧的以tj开头的套件id）；代开发应用以dk开头
      */
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 64, options: ['comment' => '模板ID'])]
     private ?string $suiteId = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 200, options: ['comment' => '模板Secret'])]
     private ?string $suiteSecret = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 250, nullable: true, options: ['comment' => '模板Ticket'])]
     private ?string $suiteTicket = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 200, nullable: true, options: ['comment' => 'AccessToken'])]
     private ?string $suiteAccessToken = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => 'Token过期时间'])]
     private ?\DateTimeInterface $tokenExpireTime = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => 'Ticket过期时间'])]
     private ?\DateTimeInterface $ticketExpireTime = null;
 
     #[ORM\OneToMany(mappedBy: 'suite', targetEntity: AuthCorp::class)]
     private Collection $authCorps;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => '回调用Token'])]
     private ?string $token = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 120, nullable: true, options: ['comment' => '回调用EncodingAESKey'])]
     private ?string $encodingAesKey = null;
 

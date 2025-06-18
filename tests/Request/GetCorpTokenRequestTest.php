@@ -55,8 +55,6 @@ class GetCorpTokenRequestTest extends TestCase
         $this->request->setPermanentCode($permanentCode);
         
         $options = $this->request->getRequestOptions();
-        
-        $this->assertIsArray($options);
         $this->assertArrayHasKey('query', $options);
         $this->assertArrayHasKey('corpid', $options['query']);
         $this->assertArrayHasKey('corpsecret', $options['query']);

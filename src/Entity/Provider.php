@@ -8,65 +8,40 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
-use Tourze\EasyAdmin\Attribute\Action\Creatable;
-use Tourze\EasyAdmin\Attribute\Action\Deletable;
-use Tourze\EasyAdmin\Attribute\Action\Editable;
-use Tourze\EasyAdmin\Attribute\Column\ExportColumn;
-use Tourze\EasyAdmin\Attribute\Column\ListColumn;
-use Tourze\EasyAdmin\Attribute\Field\FormField;
 use WechatWorkProviderBundle\Repository\ProviderRepository;
 
-#[Creatable]
-#[Editable]
-#[Deletable]
 #[ORM\Entity(repositoryClass: ProviderRepository::class)]
 #[ORM\Table(name: 'wechat_work_provider', options: ['comment' => '服务商'])]
 class Provider implements \Stringable
 {
     use TimestampableAware;
-    #[ExportColumn]
-    #[ListColumn(order: -1, sorter: true)]
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
     #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
     #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
     private ?string $id = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 64, options: ['comment' => '服务商corpId'])]
     private ?string $corpId = null;
 
     /**
      * @var string|null 服务商的secret，在服务商管理后台可见
      */
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 200, options: ['comment' => '服务商secret'])]
     private ?string $providerSecret = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 200, nullable: true)]
     private ?string $providerAccessToken = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $tokenExpireTime = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
     private ?\DateTimeInterface $ticketExpireTime = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => 'Token'])]
     private ?string $token = null;
 
-    #[ListColumn]
-    #[FormField]
     #[ORM\Column(length: 128, nullable: true, options: ['comment' => 'EncodingAESKey'])]
     private ?string $encodingAesKey = null;
 

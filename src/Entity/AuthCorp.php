@@ -78,8 +78,8 @@ class AuthCorp implements AccessTokenAware, \Stringable
     #[ORM\Column(length: 300, nullable: true, options: ['comment' => '授权方（企业）access_token'])]
     private ?string $accessToken = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '授权方（企业）access_token超时时间'])]
-    private ?\DateTimeInterface $tokenExpireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '授权方（企业）access_token超时时间'])]
+    private ?\DateTimeImmutable $tokenExpireTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'authCorps')]
     private ?Suite $suite = null;
@@ -316,12 +316,12 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this;
     }
 
-    public function getTokenExpireTime(): ?\DateTimeInterface
+    public function getTokenExpireTime(): ?\DateTimeImmutable
     {
         return $this->tokenExpireTime;
     }
 
-    public function setTokenExpireTime(?\DateTimeInterface $tokenExpireTime): self
+    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): self
     {
         $this->tokenExpireTime = $tokenExpireTime;
 

@@ -33,11 +33,11 @@ class Provider implements \Stringable
     #[ORM\Column(length: 200, nullable: true)]
     private ?string $providerAccessToken = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $tokenExpireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $tokenExpireTime = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTimeInterface $ticketExpireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $ticketExpireTime = null;
 
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => 'Token'])]
     private ?string $token = null;
@@ -95,24 +95,24 @@ class Provider implements \Stringable
         return $this;
     }
 
-    public function getTokenExpireTime(): ?\DateTimeInterface
+    public function getTokenExpireTime(): ?\DateTimeImmutable
     {
         return $this->tokenExpireTime;
     }
 
-    public function setTokenExpireTime(?\DateTimeInterface $tokenExpireTime): self
+    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): self
     {
         $this->tokenExpireTime = $tokenExpireTime;
 
         return $this;
     }
 
-    public function getTicketExpireTime(): ?\DateTimeInterface
+    public function getTicketExpireTime(): ?\DateTimeImmutable
     {
         return $this->ticketExpireTime;
     }
 
-    public function setTicketExpireTime(?\DateTimeInterface $ticketExpireTime): self
+    public function setTicketExpireTime(?\DateTimeImmutable $ticketExpireTime): self
     {
         $this->ticketExpireTime = $ticketExpireTime;
 

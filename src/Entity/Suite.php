@@ -40,11 +40,11 @@ class Suite implements \Stringable
     #[ORM\Column(length: 200, nullable: true, options: ['comment' => 'AccessToken'])]
     private ?string $suiteAccessToken = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => 'Token过期时间'])]
-    private ?\DateTimeInterface $tokenExpireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'Token过期时间'])]
+    private ?\DateTimeImmutable $tokenExpireTime = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => 'Ticket过期时间'])]
-    private ?\DateTimeInterface $ticketExpireTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'Ticket过期时间'])]
+    private ?\DateTimeImmutable $ticketExpireTime = null;
 
     #[ORM\OneToMany(mappedBy: 'suite', targetEntity: AuthCorp::class)]
     private Collection $authCorps;
@@ -114,24 +114,24 @@ class Suite implements \Stringable
         return $this;
     }
 
-    public function getTokenExpireTime(): ?\DateTimeInterface
+    public function getTokenExpireTime(): ?\DateTimeImmutable
     {
         return $this->tokenExpireTime;
     }
 
-    public function setTokenExpireTime(?\DateTimeInterface $tokenExpireTime): self
+    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): self
     {
         $this->tokenExpireTime = $tokenExpireTime;
 
         return $this;
     }
 
-    public function getTicketExpireTime(): ?\DateTimeInterface
+    public function getTicketExpireTime(): ?\DateTimeImmutable
     {
         return $this->ticketExpireTime;
     }
 
-    public function setTicketExpireTime(?\DateTimeInterface $ticketExpireTime): self
+    public function setTicketExpireTime(?\DateTimeImmutable $ticketExpireTime): self
     {
         $this->ticketExpireTime = $ticketExpireTime;
 

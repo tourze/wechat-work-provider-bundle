@@ -10,7 +10,7 @@ use WechatWorkProviderBundle\Repository\ProviderServerMessageRepository;
 
 #[ORM\Entity(repositoryClass: ProviderServerMessageRepository::class)]
 #[ORM\Table(name: 'wechat_work_provider_server_message', options: ['comment' => '服务商回调'])]
-class ProviderServerMessage
+class ProviderServerMessage implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -22,8 +22,8 @@ class ProviderServerMessage
 
     #[IndexColumn]
     #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeInterface $createTime = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '创建时间'])]
+    private ?\DateTimeImmutable $createTime = null;
 
     /**
      * 这里存储的是反序列后又序列化的原始数据.
@@ -51,14 +51,14 @@ class ProviderServerMessage
         return $this;
     }
 
-    public function setCreateTime(?\DateTimeInterface $createdAt): self
+    public function setCreateTime(?\DateTimeImmutable $createdAt): self
     {
         $this->createTime = $createdAt;
 
         return $this;
     }
 
-    public function getCreateTime(): ?\DateTimeInterface
+    public function getCreateTime(): ?\DateTimeImmutable
     {
         return $this->createTime;
     }
@@ -85,5 +85,11 @@ class ProviderServerMessage
         $this->provider = $provider;
 
         return $this;
+    }
+
+
+    public function __toString(): string
+    {
+        return sprintf('%s #%s', 'ProviderServerMessage', $this->id ?? 'new');
     }
 }

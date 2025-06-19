@@ -18,6 +18,7 @@ use WechatWorkProviderBundle\Service\ProviderService;
 #[AsCommand(name: 'wechat-work-provider:refresh-auth-corp-access-token', description: '刷新代开发授权应用access_token')]
 class RefreshAuthCorpAccessTokenCommand extends Command
 {
+    private const NAME = 'wechat-work-provider:refresh-auth-corp-access-token';
     public function __construct(
         private readonly AuthCorpRepository $corpRepository,
         private readonly ProviderService $providerService,

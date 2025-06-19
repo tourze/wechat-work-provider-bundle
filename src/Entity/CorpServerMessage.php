@@ -9,7 +9,7 @@ use WechatWorkProviderBundle\Repository\CorpServerMessageRepository;
 
 #[ORM\Entity(repositoryClass: CorpServerMessageRepository::class)]
 #[ORM\Table(name: 'wechat_work_provider_corp_server_message', options: ['comment' => '代开发回调'])]
-class CorpServerMessage
+class CorpServerMessage implements \Stringable
 {
     #[ORM\Id]
     #[ORM\GeneratedValue(strategy: 'CUSTOM')]
@@ -308,5 +308,11 @@ class CorpServerMessage
         $this->response = $response;
 
         return $this;
+    }
+
+
+    public function __toString(): string
+    {
+        return sprintf('%s User:%s', 'CorpServerMessage', $this->userId ?? 'unknown');
     }
 }

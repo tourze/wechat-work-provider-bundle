@@ -2,7 +2,7 @@
 
 namespace WechatWorkProviderBundle\Service;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use HttpClientBundle\Client\ApiClient;
 use HttpClientBundle\Client\ClientTrait;
@@ -14,8 +14,6 @@ use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
-use WechatWorkProviderBundle\Repository\AuthCorpRepository;
-use WechatWorkProviderBundle\Repository\SuiteRepository;
 use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
 use WechatWorkProviderBundle\Request\GetProviderTokenRequest;
 use WechatWorkProviderBundle\Request\GetSuiteTokenRequest;
@@ -29,8 +27,6 @@ class ProviderService extends ApiClient
     use ClientTrait;
 
     public function __construct(
-        private readonly SuiteRepository $suiteRepository,
-        private readonly AuthCorpRepository $authCorpRepository,
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
         private readonly EntityManagerInterface $entityManager,
@@ -50,7 +46,7 @@ class ProviderService extends ApiClient
         $corp = $this->corpRepository->findOneBy([
             'corpId' => $authCorp->getCorpId(),
         ]);
-        if (!$corp) {
+        if ($corp === null) {
             $corp = new Corp();
             $corp->setCorpId($authCorp->getCorpId());
         }
@@ -70,7 +66,7 @@ class ProviderService extends ApiClient
                 'corp' => $corp,
                 'agentId' => $item['agentid'],
             ]);
-            if (!$agent) {
+            if ($agent === null) {
                 $agent = new Agent();
                 $agent->setCorp($corp);
                 $agent->setAgentId($item['agentid']);
@@ -100,23 +96,23 @@ class ProviderService extends ApiClient
 
         if ($request instanceof WithSuiteRequest) {
             $suite = $request->getSuite();
-            $now = Carbon::now();
+            $now = CarbonImmutable::now();
 
-            if (!$suite->getTokenExpireTime()) {
-                $suite->setTokenExpireTime(Carbon::now()->lastOfYear());
+            if ($suite->getTokenExpireTime() === null) {
+                $suite->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
             }
-            if ($suite->getSuiteAccessToken() && $now->greaterThan($suite->getTokenExpireTime())) {
+            if ($suite->getSuiteAccessToken() !== null && $suite->getSuiteAccessToken() !== '' && $now->greaterThan($suite->getTokenExpireTime())) {
                 $suite->setSuiteAccessToken('');
             }
 
-            if (!$suite->getSuiteAccessToken()) {
+            if ($suite->getSuiteAccessToken() === null || $suite->getSuiteAccessToken() === '') {
                 $tokenRequest = new GetSuiteTokenRequest();
                 $tokenRequest->setSuiteId($suite->getSuiteId());
                 $tokenRequest->setSuiteSecret($suite->getSuiteSecret());
                 $tokenRequest->setSuiteTicket($suite->getSuiteTicket());
                 $tokenResponse = $this->request($tokenRequest);
                 $suite->setSuiteAccessToken($tokenResponse['suite_access_token']);
-                $suite->setTokenExpireTime(Carbon::now()->addSeconds($tokenResponse['expires_in']));
+                $suite->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
                 $this->entityManager->persist($suite);
                 $this->entityManager->flush();
             }
@@ -126,16 +122,16 @@ class ProviderService extends ApiClient
 
         if ($request instanceof WithAuthCorpRequest) {
             $authCorp = $request->getAuthCorp();
-            $now = Carbon::now();
+            $now = CarbonImmutable::now();
 
-            if (!$authCorp->getTokenExpireTime()) {
-                $authCorp->setTokenExpireTime(Carbon::now()->lastOfYear());
+            if ($authCorp->getTokenExpireTime() === null) {
+                $authCorp->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
             }
-            if ($authCorp->getAccessToken() && $now->greaterThan($authCorp->getTokenExpireTime())) {
+            if ($authCorp->getAccessToken() !== null && $authCorp->getAccessToken() !== '' && $now->greaterThan($authCorp->getTokenExpireTime())) {
                 $authCorp->setAccessToken('');
             }
 
-            if (!$authCorp->getAccessToken()) {
+            if ($authCorp->getAccessToken() === null || $authCorp->getAccessToken() === '') {
                 $tokenRequest = new GetCorpTokenRequest();
                 $tokenRequest->setAuthCorpId($authCorp->getCorpId());
                 $tokenRequest->setPermanentCode($authCorp->getPermanentCode());
@@ -149,7 +145,7 @@ class ProviderService extends ApiClient
                 }
 
                 $authCorp->setAccessToken($tokenResponse['access_token']);
-                $authCorp->setTokenExpireTime(Carbon::now()->addSeconds($tokenResponse['expires_in']));
+                $authCorp->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
                 $this->entityManager->persist($authCorp);
                 $this->entityManager->flush();
             }
@@ -159,22 +155,22 @@ class ProviderService extends ApiClient
 
         if ($request instanceof WithProviderRequest) {
             $provider = $request->getProvider();
-            $now = Carbon::now();
+            $now = CarbonImmutable::now();
 
-            if (!$provider->getTokenExpireTime()) {
-                $provider->setTokenExpireTime(Carbon::now()->lastOfYear());
+            if ($provider->getTokenExpireTime() === null) {
+                $provider->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
             }
-            if ($provider->getProviderAccessToken() && $now->greaterThanOrEqualTo($provider->getTokenExpireTime())) {
+            if ($provider->getProviderAccessToken() !== null && $provider->getProviderAccessToken() !== '' && $now->greaterThanOrEqualTo($provider->getTokenExpireTime())) {
                 $provider->setProviderAccessToken('');
             }
 
-            if (!$provider->getProviderAccessToken()) {
+            if ($provider->getProviderAccessToken() === null || $provider->getProviderAccessToken() === '') {
                 $tokenRequest = new GetProviderTokenRequest();
                 $tokenRequest->setCorpId($provider->getCorpId());
                 $tokenRequest->setProviderSecret($provider->getProviderSecret());
                 $tokenResponse = $this->request($tokenRequest);
                 $provider->setProviderAccessToken($tokenResponse['provider_access_token']);
-                $provider->setTokenExpireTime(Carbon::now()->addSeconds($tokenResponse['expires_in']));
+                $provider->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
                 $this->entityManager->persist($provider);
                 $this->entityManager->flush();
             }

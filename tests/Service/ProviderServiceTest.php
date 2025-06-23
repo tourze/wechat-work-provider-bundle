@@ -10,17 +10,11 @@ use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
-use WechatWorkProviderBundle\Repository\AuthCorpRepository;
-use WechatWorkProviderBundle\Repository\SuiteRepository;
 use WechatWorkProviderBundle\Service\ProviderService;
 
 class ProviderServiceTest extends TestCase
 {
     private ProviderService $providerService;
-    /** @var SuiteRepository&MockObject */
-    private MockObject $suiteRepository;
-    /** @var AuthCorpRepository&MockObject */
-    private MockObject $authCorpRepository;
     /** @var CorpRepository&MockObject */
     private MockObject $corpRepository;
     /** @var AgentRepository&MockObject */
@@ -30,15 +24,11 @@ class ProviderServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->suiteRepository = $this->createMock(SuiteRepository::class);
-        $this->authCorpRepository = $this->createMock(AuthCorpRepository::class);
         $this->corpRepository = $this->createMock(CorpRepository::class);
         $this->agentRepository = $this->createMock(AgentRepository::class);
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
 
         $this->providerService = new ProviderService(
-            $this->suiteRepository,
-            $this->authCorpRepository,
             $this->corpRepository,
             $this->agentRepository,
             $this->entityManager
@@ -58,7 +48,7 @@ class ProviderServiceTest extends TestCase
         $authCorp->setCorpId('test_corp_id');
         $authCorp->setCorpName('测试企业');
         $authCorp->setAccessToken('access_token_123');
-        $authCorp->setTokenExpireTime(new \DateTime('2024-12-31'));
+        $authCorp->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'));
         $authCorp->setAuthInfo([
             'agent' => [
                 [
@@ -108,7 +98,7 @@ class ProviderServiceTest extends TestCase
         $authCorp->setCorpId('new_corp_id');
         $authCorp->setCorpName('新企业');
         $authCorp->setAccessToken('access_token_456');
-        $authCorp->setTokenExpireTime(new \DateTime('2024-12-31'));
+        $authCorp->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'));
         $authCorp->setAuthInfo([
             'agent' => [
                 [
@@ -152,7 +142,7 @@ class ProviderServiceTest extends TestCase
         $authCorp->setCorpId('test_corp_id');
         $authCorp->setCorpName('测试企业');
         $authCorp->setAccessToken('access_token_789');
-        $authCorp->setTokenExpireTime(new \DateTime('2024-12-31'));
+        $authCorp->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'));
         $authCorp->setAuthInfo([
             'agent' => [
                 [
@@ -168,7 +158,7 @@ class ProviderServiceTest extends TestCase
 
         $existingAgent = new Agent();
         $existingAgent->setCorp($existingCorp);
-        $existingAgent->setAgentId(1000003);
+        $existingAgent->setAgentId('1000003');
         $existingAgent->setName('旧应用名称');
 
         // 模拟存储库行为
@@ -207,7 +197,7 @@ class ProviderServiceTest extends TestCase
         $authCorp->setCorpId('multi_corp_id');
         $authCorp->setCorpName('多应用企业');
         $authCorp->setAccessToken('multi_access_token');
-        $authCorp->setTokenExpireTime(new \DateTime('2024-12-31'));
+        $authCorp->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'));
         $authCorp->setAuthInfo([
             'agent' => [
                 [
@@ -292,7 +282,7 @@ class ProviderServiceTest extends TestCase
         $authCorp->setCorpId('direct_corp_id');
         $authCorp->setCorpName('直接格式企业');
         $authCorp->setAccessToken('direct_access_token');
-        $authCorp->setTokenExpireTime(new \DateTime('2024-12-31'));
+        $authCorp->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'));
         $authCorp->setAuthInfo([
             [
                 'agentid' => 1000001,

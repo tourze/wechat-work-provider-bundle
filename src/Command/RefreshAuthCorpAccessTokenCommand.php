@@ -2,7 +2,7 @@
 
 namespace WechatWorkProviderBundle\Command;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Attribute\AsCommand;
@@ -15,7 +15,7 @@ use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
 use WechatWorkProviderBundle\Service\ProviderService;
 
 #[AsCronTask('* * * * *')]
-#[AsCommand(name: 'wechat-work-provider:refresh-auth-corp-access-token', description: '刷新代开发授权应用access_token')]
+#[AsCommand(name: self::NAME, description: '刷新代开发授权应用access_token')]
 class RefreshAuthCorpAccessTokenCommand extends Command
 {
     private const NAME = 'wechat-work-provider:refresh-auth-corp-access-token';
@@ -32,16 +32,16 @@ class RefreshAuthCorpAccessTokenCommand extends Command
     {
         foreach ($this->corpRepository->findAll() as $authCorp) {
             // 定时任务刷新的时候，提前几分钟过期
-            $now = Carbon::now()->subMinutes(5);
+            $now = CarbonImmutable::now()->subMinutes(5);
 
-            if (!$authCorp->getTokenExpireTime()) {
-                $authCorp->setTokenExpireTime(Carbon::now()->lastOfYear());
+            if ($authCorp->getTokenExpireTime() === null) {
+                $authCorp->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
             }
-            if ($authCorp->getAccessToken() && $now->greaterThan($authCorp->getTokenExpireTime())) {
+            if ($authCorp->getAccessToken() !== null && $authCorp->getAccessToken() !== '' && $now->greaterThan($authCorp->getTokenExpireTime())) {
                 $authCorp->setAccessToken('');
             }
 
-            if (!$authCorp->getAccessToken()) {
+            if ($authCorp->getAccessToken() === null || $authCorp->getAccessToken() === '') {
                 $tokenRequest = new GetCorpTokenRequest();
                 $tokenRequest->setAuthCorpId($authCorp->getCorpId());
                 $tokenRequest->setPermanentCode($authCorp->getPermanentCode());
@@ -55,7 +55,7 @@ class RefreshAuthCorpAccessTokenCommand extends Command
                 }
 
                 $authCorp->setAccessToken($tokenResponse['access_token']);
-                $authCorp->setTokenExpireTime(Carbon::now()->addSeconds($tokenResponse['expires_in']));
+                $authCorp->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
                 $this->entityManager->persist($authCorp);
                 $this->entityManager->flush();
             }

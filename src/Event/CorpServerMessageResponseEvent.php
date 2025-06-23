@@ -12,6 +12,14 @@ class CorpServerMessageResponseEvent extends Event
 
     private AuthCorp $authCorp;
 
+    private array $responseData = [];
+
+    public function __construct(CorpServerMessage $message)
+    {
+        $this->message = $message;
+        $this->authCorp = $message->getAuthCorp();
+    }
+
     public function getMessage(): CorpServerMessage
     {
         return $this->message;
@@ -30,5 +38,15 @@ class CorpServerMessageResponseEvent extends Event
     public function setAuthCorp(AuthCorp $authCorp): void
     {
         $this->authCorp = $authCorp;
+    }
+
+    public function getResponseData(): array
+    {
+        return $this->responseData;
+    }
+
+    public function setResponseData(array $responseData): void
+    {
+        $this->responseData = $responseData;
     }
 }

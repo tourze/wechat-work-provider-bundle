@@ -133,7 +133,7 @@ class WXBizMsgCrypt
             $ret = $array[0];
 
             if (0 != $ret) {
-                return $ret;
+                return intval($ret);
             }
             $encrypt = $array[1];
         }

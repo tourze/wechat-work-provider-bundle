@@ -11,7 +11,7 @@ use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 use WechatWorkProviderBundle\Service\ProviderService;
 
 #[AsCronTask('* * * * *')]
-#[AsCommand(name: SyncWechatWorkCorpInfoCommand::NAME, description: '将授权的企业信息同步一份到WechatWorkBundle')]
+#[AsCommand(name: self::NAME, description: '将授权的企业信息同步一份到WechatWorkBundle')]
 class SyncWechatWorkCorpInfoCommand extends Command
 {
     public const NAME = 'wechat-work-provider:sync-corp-info';

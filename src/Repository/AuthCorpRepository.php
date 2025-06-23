@@ -26,7 +26,7 @@ class AuthCorpRepository extends ServiceEntityRepository
         $corp = $this->corpRepository->findOneBy([
             'corpId' => $authCorp->getCorpId(),
         ]);
-        if (!$corp) {
+        if ($corp === null) {
             return null;
         }
 

@@ -208,7 +208,7 @@ class AuthCorpTest extends TestCase
 
     public function testTokenExpireTimeGetterAndSetter(): void
     {
-        $expireTime = new \DateTime('2024-12-31 23:59:59');
+        $expireTime = new \DateTimeImmutable('2024-12-31 23:59:59');
         $this->authCorp->setTokenExpireTime($expireTime);
         $this->assertSame($expireTime, $this->authCorp->getTokenExpireTime());
         

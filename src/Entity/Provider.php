@@ -30,13 +30,13 @@ class Provider implements \Stringable
     #[ORM\Column(length: 200, options: ['comment' => '服务商secret'])]
     private ?string $providerSecret = null;
 
-    #[ORM\Column(length: 200, nullable: true)]
+    #[ORM\Column(length: 200, nullable: true, options: ['comment' => '服务商AccessToken'])]
     private ?string $providerAccessToken = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'AccessToken过期时间'])]
     private ?\DateTimeImmutable $tokenExpireTime = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'Ticket过期时间'])]
     private ?\DateTimeImmutable $ticketExpireTime = null;
 
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => 'Token'])]
@@ -59,7 +59,7 @@ class Provider implements \Stringable
 
     public function __toString(): string
     {
-        if (!$this->getCorpId()) {
+        if ($this->getCorpId() === null || $this->getCorpId() === '') {
             return '';
         }
 

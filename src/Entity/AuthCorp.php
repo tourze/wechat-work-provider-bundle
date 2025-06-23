@@ -64,10 +64,10 @@ class AuthCorp implements AccessTokenAware, \Stringable
     private array $authUserInfo = [];
 
     #[ORM\Column(nullable: true, options: ['comment' => '代理服务商企业信息'])]
-    private ?array $dealerCorpInfo = [];
+    private array $dealerCorpInfo = [];
 
     #[ORM\Column(nullable: true, options: ['comment' => '推广二维码安装相关信息'])]
-    private ?array $registerCodeInfo = [];
+    private array $registerCodeInfo = [];
 
     #[ORM\Column(length: 100, nullable: true, options: ['comment' => '安装应用时，扫码或者授权链接中带的state值'])]
     private ?string $state = null;
@@ -100,7 +100,7 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function __toString(): string
     {
-        if (!$this->getId()) {
+        if ($this->getId() === null || $this->getId() === '') {
             return '';
         }
 

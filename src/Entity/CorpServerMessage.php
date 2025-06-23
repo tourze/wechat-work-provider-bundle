@@ -32,49 +32,46 @@ class CorpServerMessage implements \Stringable
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => 'Encrypt参数解密后的内容'])]
     private array $decryptData = [];
 
-    /**
-     * 这里存储的是反序列后又序列化的原始数据.
-     */
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '原始数据'])]
     private ?array $rawData = null;
 
-    #[ORM\Column(length: 50, nullable: true)]
+    #[ORM\Column(length: 50, nullable: true, options: ['comment' => '消息类型'])]
     private ?string $msgType = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '事件类型'])]
     private ?string $event = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '变更类型'])]
     private ?string $changeType = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '群聊ID'])]
     private ?string $chatId = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '外部联系人ID'])]
     private ?string $externalUserId = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ['comment' => '加入场景'])]
     private ?int $joinScene = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ['comment' => '成员变更数量'])]
     private ?int $memChangeCnt = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ['comment' => '退出场景'])]
     private ?int $quitScene = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '状态'])]
     private ?string $state = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '更新详情'])]
     private ?string $updateDetail = null;
 
-    #[ORM\Column(length: 120, nullable: true)]
+    #[ORM\Column(length: 120, nullable: true, options: ['comment' => '用户ID'])]
     private ?string $userId = null;
 
-    #[ORM\Column(length: 140, nullable: true)]
+    #[ORM\Column(length: 140, nullable: true, options: ['comment' => '欢迎语Code'])]
     private ?string $welcomeCode = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: true, options: ['comment' => '响应数据'])]
     private ?array $response = null;
 
     public function getId(): ?string
@@ -150,6 +147,13 @@ class CorpServerMessage implements \Stringable
     public function setDecryptData(?array $decryptData): self
     {
         $this->decryptData = $decryptData;
+
+        return $this;
+    }
+
+    public function setContext(?array $context): self
+    {
+        $this->decryptData = $context ?? [];
 
         return $this;
     }

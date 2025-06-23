@@ -4,14 +4,14 @@ namespace WechatWorkProviderBundle\Entity;
 
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineIndexedBundle\Attribute\IndexColumn;
-use Tourze\DoctrineTimestampBundle\Attribute\CreateTimeColumn;
+use Tourze\DoctrineTimestampBundle\Traits\CreateTimeAware;
 use WechatWorkProviderBundle\Repository\SuiteServerMessageRepository;
 
 #[ORM\Entity(repositoryClass: SuiteServerMessageRepository::class)]
 #[ORM\Table(name: 'wechat_work_suite_server_message', options: ['comment' => '应用模板回调'])]
 class SuiteServerMessage implements \Stringable
 {
+    use CreateTimeAware;
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column(type: Types::INTEGER, options: ['comment' => 'ID'])]
@@ -20,14 +20,6 @@ class SuiteServerMessage implements \Stringable
     #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '上下文'])]
     private ?array $context = [];
 
-    #[IndexColumn]
-    #[CreateTimeColumn]
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '创建时间'])]
-    private ?\DateTimeImmutable $createTime = null;
-
-    /**
-     * 这里存储的是反序列后又序列化的原始数据.
-     */
     #[ORM\Column(type: Types::TEXT, nullable: true, options: ['comment' => '原始数据'])]
     private ?string $rawData = null;
 
@@ -51,17 +43,6 @@ class SuiteServerMessage implements \Stringable
         return $this;
     }
 
-    public function setCreateTime(?\DateTimeImmutable $createdAt): self
-    {
-        $this->createTime = $createdAt;
-
-        return $this;
-    }
-
-    public function getCreateTime(): ?\DateTimeImmutable
-    {
-        return $this->createTime;
-    }
 
     public function getRawData(): ?string
     {

@@ -14,9 +14,9 @@ class PKCS7Encoder
     /**
      * 对需要加密的明文进行填充补位
      *
-     * @param $text 需要进行填充补位操作的明文
+     * @param string $text 需要进行填充补位操作的明文
      *
-     * @return 补齐明文字符串
+     * @return string 补齐明文字符串
      */
     public function encode($text)
     {

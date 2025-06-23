@@ -67,7 +67,7 @@ class ProviderTest extends TestCase
 
     public function testTokenExpireTimeGetterAndSetter(): void
     {
-        $expireTime = new \DateTime('2024-12-31 23:59:59');
+        $expireTime = new \DateTimeImmutable('2024-12-31 23:59:59');
         $this->provider->setTokenExpireTime($expireTime);
         $this->assertSame($expireTime, $this->provider->getTokenExpireTime());
         
@@ -78,7 +78,7 @@ class ProviderTest extends TestCase
 
     public function testTicketExpireTimeGetterAndSetter(): void
     {
-        $ticketExpireTime = new \DateTime('2024-11-30 12:00:00');
+        $ticketExpireTime = new \DateTimeImmutable('2024-11-30 12:00:00');
         $this->provider->setTicketExpireTime($ticketExpireTime);
         $this->assertSame($ticketExpireTime, $this->provider->getTicketExpireTime());
         
@@ -217,8 +217,8 @@ class ProviderTest extends TestCase
         $result = $this->provider
             ->setProviderSecret('secret123')
             ->setProviderAccessToken('token456')
-            ->setTokenExpireTime(new \DateTime('2024-12-31'))
-            ->setTicketExpireTime(new \DateTime('2024-11-30'))
+            ->setTokenExpireTime(new \DateTimeImmutable('2024-12-31'))
+            ->setTicketExpireTime(new \DateTimeImmutable('2024-11-30'))
             ->setToken('callback_token')
             ->setEncodingAesKey('aes_key');
             

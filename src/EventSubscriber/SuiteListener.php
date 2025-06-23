@@ -2,7 +2,7 @@
 
 namespace WechatWorkProviderBundle\EventSubscriber;
 
-use Carbon\Carbon;
+use Carbon\CarbonImmutable;
 use Doctrine\Bundle\DoctrineBundle\Attribute\AsEntityListener;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Events;
@@ -30,9 +30,9 @@ class SuiteListener
             $suite = $this->suiteRepository->findOneBy([
                 'suiteId' => $msg['SuiteId'],
             ]);
-            if ($suite) {
+            if ($suite !== null) {
                 $suite->setSuiteTicket($msg['SuiteTicket']);
-                $suite->setTicketExpireTime(Carbon::now()->addMinutes(30));
+                $suite->setTicketExpireTime(CarbonImmutable::now()->addMinutes(30));
                 $this->entityManager->persist($suite);
                 $this->entityManager->flush();
             }

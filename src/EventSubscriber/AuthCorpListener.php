@@ -46,7 +46,7 @@ class AuthCorpListener
                 'suite' => $suite,
                 'corpId' => $response['auth_corp_info']['corpid'],
             ]);
-            if (!$authCorp) {
+            if ($authCorp === null) {
                 $authCorp = new AuthCorp();
                 $authCorp->setSuite($suite);
                 $authCorp->setCorpId($response['auth_corp_info']['corpid']);

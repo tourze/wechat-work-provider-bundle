@@ -22,7 +22,7 @@ class CorpCallbackController extends AbstractController
 {
     public function __construct(private readonly EntityManagerInterface $entityManager) {}
 
-    #[Route('/wechat-work-provider/server/start/{corpId}')]
+    #[Route(path: '/wechat-work-provider/server/start/{corpId}')]
     public function __invoke(
         string $corpId,
         Request $request,

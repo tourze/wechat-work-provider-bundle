@@ -26,7 +26,7 @@ class SuiteCallbackController extends AbstractController
      *
      * @see https://developer.work.weixin.qq.com/document/path/90600
      */
-    #[Route('/wechat-work-provider/server/suite/{id}')]
+    #[Route(path: '/wechat-work-provider/server/suite/{id}')]
     public function __invoke(
         Suite $suite,
         Request $request,

@@ -14,6 +14,7 @@ use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
+use WechatWorkProviderBundle\Exception\AccessTokenException;
 use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
 use WechatWorkProviderBundle\Request\GetProviderTokenRequest;
 use WechatWorkProviderBundle\Request\GetSuiteTokenRequest;
@@ -84,7 +85,7 @@ class ProviderService extends ApiClient
 
     protected function getRequestMethod(RequestInterface $request): string
     {
-        return $request->getRequestMethod() ?: 'POST';
+        return $request->getRequestMethod() ?? 'POST';
     }
 
     protected function getRequestOptions(RequestInterface $request): ?array
@@ -141,7 +142,7 @@ class ProviderService extends ApiClient
                         'authCorp' => $authCorp,
                         'tokenResponse' => $tokenResponse,
                     ]);
-                    throw new \RuntimeException('无法获取应用AccessToken');
+                    throw new AccessTokenException('无法获取应用AccessToken');
                 }
 
                 $authCorp->setAccessToken($tokenResponse['access_token']);

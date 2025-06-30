@@ -14,7 +14,7 @@ use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
 use WechatWorkProviderBundle\Service\ProviderService;
 
-#[AsCronTask('* * * * *')]
+#[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '刷新代开发授权应用access_token')]
 class RefreshAuthCorpAccessTokenCommand extends Command
 {

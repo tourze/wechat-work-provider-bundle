@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatWorkProviderBundle\Repository\ProviderRepository;
 
@@ -15,11 +15,7 @@ use WechatWorkProviderBundle\Repository\ProviderRepository;
 class Provider implements \Stringable
 {
     use TimestampableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[ORM\Column(length: 64, options: ['comment' => '服务商corpId'])]
     private ?string $corpId = null;
@@ -66,10 +62,6 @@ class Provider implements \Stringable
         return "{$this->getCorpId()}";
     }
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getProviderSecret(): ?string
     {

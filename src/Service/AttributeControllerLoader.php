@@ -11,7 +11,7 @@ use WechatWorkProviderBundle\Controller\CorpCallbackController;
 use WechatWorkProviderBundle\Controller\ProviderCallbackController;
 use WechatWorkProviderBundle\Controller\SuiteCallbackController;
 
-#[AutoconfigureTag('routing.loader')]
+#[AutoconfigureTag(name: 'routing.loader')]
 class AttributeControllerLoader extends Loader implements RoutingAutoLoaderInterface
 {
     private AttributeRouteControllerLoader $controllerLoader;

@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Tourze\DoctrineSnowflakeBundle\Service\SnowflakeIdGenerator;
+use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatWorkBundle\Entity\AccessTokenAware;
 use WechatWorkProviderBundle\Repository\AuthCorpRepository;
@@ -21,11 +21,7 @@ use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 class AuthCorp implements AccessTokenAware, \Stringable
 {
     use TimestampableAware;
-    #[ORM\Id]
-    #[ORM\GeneratedValue(strategy: 'CUSTOM')]
-    #[ORM\CustomIdGenerator(SnowflakeIdGenerator::class)]
-    #[ORM\Column(type: Types::BIGINT, nullable: false, options: ['comment' => 'ID'])]
-    private ?string $id = null;
+    use SnowflakeKeyAware;
 
     #[ORM\Column(length: 80, options: ['comment' => '授权方企业微信id'])]
     private ?string $corpId = null;
@@ -107,10 +103,6 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return "{$this->getCorpName()}";
     }
 
-    public function getId(): ?string
-    {
-        return $this->id;
-    }
 
     public function getCorpId(): ?string
     {

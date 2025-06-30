@@ -10,7 +10,7 @@ use Tourze\Symfony\CronJob\Attribute\AsCronTask;
 use WechatWorkProviderBundle\Repository\AuthCorpRepository;
 use WechatWorkProviderBundle\Service\ProviderService;
 
-#[AsCronTask('* * * * *')]
+#[AsCronTask(expression: '* * * * *')]
 #[AsCommand(name: self::NAME, description: '将授权的企业信息同步一份到WechatWorkBundle')]
 class SyncWechatWorkCorpInfoCommand extends Command
 {

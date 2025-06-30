@@ -25,7 +25,7 @@ class ProviderCallbackController extends AbstractController
      *
      * @see https://developer.work.weixin.qq.com/document/path/97172
      */
-    #[Route('/wechat-work-provider/server/provider/{id}')]
+    #[Route(path: '/wechat-work-provider/server/provider/{id}')]
     public function __invoke(
         Provider $provider,
         Request $request,

@@ -26,9 +26,26 @@ class WechatWorkSubscriber
         $corp = $this->providerService->syncAuthCorpToCorpAndAgent($event->getAuthCorp());
         $arr = $event->getMessage()->getRawData();
 
-        $message = ServerMessage::createFromArray($arr);
+        if (null === $arr) {
+            return;
+        }
+
+        // 确保数组键都是字符串类型
+        $normalizedArr = [];
+        foreach ($arr as $key => $value) {
+            if (is_string($key)) {
+                $normalizedArr[$key] = $value;
+            }
+        }
+
+        /** @var array<string, mixed> $normalizedArr */
+        $message = ServerMessage::createFromArray($normalizedArr);
         $message->setCorp($corp);
-        $message->setAgent($corp->getAgents()->first());
+
+        $agent = $corp->getAgents()->first();
+        if (false !== $agent) {
+            $message->setAgent($agent);
+        }
 
         $nextEvent = new WechatWorkServerMessageRequestEvent();
         $nextEvent->setMessage($message);

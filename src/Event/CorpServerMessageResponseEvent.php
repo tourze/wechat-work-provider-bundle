@@ -8,16 +8,21 @@ use WechatWorkProviderBundle\Entity\CorpServerMessage;
 
 class CorpServerMessageResponseEvent extends Event
 {
-    private CorpServerMessage $message;
-
-    private AuthCorp $authCorp;
-
+    /**
+     * @var array<string, mixed>
+     */
     private array $responseData = [];
 
-    public function __construct(CorpServerMessage $message)
-    {
-        $this->message = $message;
-        $this->authCorp = $message->getAuthCorp();
+    private readonly AuthCorp $authCorp;
+
+    public function __construct(
+        private readonly CorpServerMessage $message,
+    ) {
+        $authCorp = $message->getAuthCorp();
+        if (null === $authCorp) {
+            throw new \InvalidArgumentException('AuthCorp cannot be null in CorpServerMessage');
+        }
+        $this->authCorp = $authCorp;
     }
 
     public function getMessage(): CorpServerMessage
@@ -25,26 +30,22 @@ class CorpServerMessageResponseEvent extends Event
         return $this->message;
     }
 
-    public function setMessage(CorpServerMessage $message): void
-    {
-        $this->message = $message;
-    }
-
     public function getAuthCorp(): AuthCorp
     {
         return $this->authCorp;
     }
 
-    public function setAuthCorp(AuthCorp $authCorp): void
-    {
-        $this->authCorp = $authCorp;
-    }
-
+    /**
+     * @return array<string, mixed>
+     */
     public function getResponseData(): array
     {
         return $this->responseData;
     }
 
+    /**
+     * @param array<string, mixed> $responseData
+     */
     public function setResponseData(array $responseData): void
     {
         $this->responseData = $responseData;

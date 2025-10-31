@@ -4,18 +4,33 @@ namespace WechatWorkProviderBundle\Repository;
 
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Tourze\PHPUnitSymfonyKernelTest\Attribute\AsRepository;
 use WechatWorkProviderBundle\Entity\CorpServerMessage;
 
 /**
- * @method CorpServerMessage|null find($id, $lockMode = null, $lockVersion = null)
- * @method CorpServerMessage|null findOneBy(array $criteria, array $orderBy = null)
- * @method CorpServerMessage[]    findAll()
- * @method CorpServerMessage[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @extends ServiceEntityRepository<CorpServerMessage>
  */
+#[AsRepository(entityClass: CorpServerMessage::class)]
 class CorpServerMessageRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, CorpServerMessage::class);
+    }
+
+    public function save(CorpServerMessage $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->persist($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
+    }
+
+    public function remove(CorpServerMessage $entity, bool $flush = true): void
+    {
+        $this->getEntityManager()->remove($entity);
+        if ($flush) {
+            $this->getEntityManager()->flush();
+        }
     }
 }

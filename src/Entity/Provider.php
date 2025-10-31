@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatWorkProviderBundle\Repository\ProviderRepository;
@@ -18,33 +19,48 @@ class Provider implements \Stringable
     use SnowflakeKeyAware;
 
     #[ORM\Column(length: 64, options: ['comment' => '服务商corpId'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 64)]
     private ?string $corpId = null;
 
     /**
      * @var string|null 服务商的secret，在服务商管理后台可见
      */
     #[ORM\Column(length: 200, options: ['comment' => '服务商secret'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 200)]
     private ?string $providerSecret = null;
 
     #[ORM\Column(length: 200, nullable: true, options: ['comment' => '服务商AccessToken'])]
+    #[Assert\Length(max: 200)]
     private ?string $providerAccessToken = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'AccessToken过期时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private ?\DateTimeImmutable $tokenExpireTime = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => 'Ticket过期时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private ?\DateTimeImmutable $ticketExpireTime = null;
 
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => 'Token'])]
+    #[Assert\Length(max: 40)]
     private ?string $token = null;
 
     #[ORM\Column(length: 128, nullable: true, options: ['comment' => 'EncodingAESKey'])]
+    #[Assert\Length(max: 128)]
     private ?string $encodingAesKey = null;
 
-    #[ORM\OneToMany(mappedBy: 'provider', targetEntity: Suite::class)]
+    /**
+     * @var Collection<int, Suite>
+     */
+    #[ORM\OneToMany(targetEntity: Suite::class, mappedBy: 'provider')]
     private Collection $suites;
 
-    #[ORM\OneToMany(mappedBy: 'provider', targetEntity: ProviderServerMessage::class)]
+    /**
+     * @var Collection<int, ProviderServerMessage>
+     */
+    #[ORM\OneToMany(targetEntity: ProviderServerMessage::class, mappedBy: 'provider')]
     private Collection $serverMessages;
 
     public function __construct()
@@ -55,24 +71,21 @@ class Provider implements \Stringable
 
     public function __toString(): string
     {
-        if ($this->getCorpId() === null || $this->getCorpId() === '') {
+        if (null === $this->getCorpId() || '' === $this->getCorpId()) {
             return '';
         }
 
         return "{$this->getCorpId()}";
     }
 
-
     public function getProviderSecret(): ?string
     {
         return $this->providerSecret;
     }
 
-    public function setProviderSecret(string $providerSecret): self
+    public function setProviderSecret(string $providerSecret): void
     {
         $this->providerSecret = $providerSecret;
-
-        return $this;
     }
 
     public function getProviderAccessToken(): ?string
@@ -80,11 +93,9 @@ class Provider implements \Stringable
         return $this->providerAccessToken;
     }
 
-    public function setProviderAccessToken(?string $providerAccessToken): self
+    public function setProviderAccessToken(?string $providerAccessToken): void
     {
         $this->providerAccessToken = $providerAccessToken;
-
-        return $this;
     }
 
     public function getTokenExpireTime(): ?\DateTimeImmutable
@@ -92,11 +103,9 @@ class Provider implements \Stringable
         return $this->tokenExpireTime;
     }
 
-    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): self
+    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): void
     {
         $this->tokenExpireTime = $tokenExpireTime;
-
-        return $this;
     }
 
     public function getTicketExpireTime(): ?\DateTimeImmutable
@@ -104,11 +113,9 @@ class Provider implements \Stringable
         return $this->ticketExpireTime;
     }
 
-    public function setTicketExpireTime(?\DateTimeImmutable $ticketExpireTime): self
+    public function setTicketExpireTime(?\DateTimeImmutable $ticketExpireTime): void
     {
         $this->ticketExpireTime = $ticketExpireTime;
-
-        return $this;
     }
 
     public function getCorpId(): ?string
@@ -116,7 +123,7 @@ class Provider implements \Stringable
         return $this->corpId;
     }
 
-    public function setCorpId(?string $corpId): void
+    public function setCorpId(string $corpId): void
     {
         $this->corpId = $corpId;
     }
@@ -126,11 +133,9 @@ class Provider implements \Stringable
         return $this->token;
     }
 
-    public function setToken(?string $token): static
+    public function setToken(?string $token): void
     {
         $this->token = $token;
-
-        return $this;
     }
 
     public function getEncodingAesKey(): ?string
@@ -138,11 +143,9 @@ class Provider implements \Stringable
         return $this->encodingAesKey;
     }
 
-    public function setEncodingAesKey(?string $encodingAesKey): static
+    public function setEncodingAesKey(?string $encodingAesKey): void
     {
         $this->encodingAesKey = $encodingAesKey;
-
-        return $this;
     }
 
     /**
@@ -203,4 +206,5 @@ class Provider implements \Stringable
         }
 
         return $this;
-    }}
+    }
+}

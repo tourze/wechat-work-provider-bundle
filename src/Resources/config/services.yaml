@@ -14,3 +14,7 @@ services:
     resource: '../../Repository/'
   WechatWorkProviderBundle\Service\:
     resource: '../../Service/'
+
+  # 公开TokenManager服务用于测试
+  WechatWorkProviderBundle\Service\TokenManager:
+    public: true

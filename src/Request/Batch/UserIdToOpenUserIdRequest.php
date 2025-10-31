@@ -12,6 +12,9 @@ use WechatWorkProviderBundle\Request\WithAuthCorpRequest;
  */
 class UserIdToOpenUserIdRequest extends WithAuthCorpRequest implements AutoRetryRequest
 {
+    /**
+     * @var array<string>
+     */
     private array $userIdList = [];
 
     public function getMaxRetries(): int
@@ -24,6 +27,9 @@ class UserIdToOpenUserIdRequest extends WithAuthCorpRequest implements AutoRetry
         return '/cgi-bin/batch/userid_to_openuserid';
     }
 
+    /**
+     * @return array<string, mixed>|null
+     */
     public function getRequestOptions(): ?array
     {
         return [
@@ -33,11 +39,17 @@ class UserIdToOpenUserIdRequest extends WithAuthCorpRequest implements AutoRetry
         ];
     }
 
+    /**
+     * @return array<string>
+     */
     public function getUserIdList(): array
     {
         return $this->userIdList;
     }
 
+    /**
+     * @param array<string> $userIdList
+     */
     public function setUserIdList(array $userIdList): void
     {
         $this->userIdList = $userIdList;

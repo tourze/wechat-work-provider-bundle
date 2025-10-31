@@ -1,3 +1,0 @@
-wechat_work_provider_controllers:
-  resource: '../../Controller/'
-  type: attribute

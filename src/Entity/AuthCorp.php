@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 use Tourze\DoctrineSnowflakeBundle\Traits\SnowflakeKeyAware;
 use Tourze\DoctrineTimestampBundle\Traits\TimestampableAware;
 use WechatWorkBundle\Entity\AccessTokenAware;
@@ -24,69 +25,107 @@ class AuthCorp implements AccessTokenAware, \Stringable
     use SnowflakeKeyAware;
 
     #[ORM\Column(length: 80, options: ['comment' => '授权方企业微信id'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 80)]
     private ?string $corpId = null;
 
     #[ORM\Column(length: 120, options: ['comment' => '授权方企业简称'])]
+    #[Assert\NotBlank]
+    #[Assert\Length(max: 120)]
     private ?string $corpName = null;
 
     #[ORM\Column(length: 30, nullable: true, options: ['comment' => '授权方企业类型'])]
+    #[Assert\Length(max: 30)]
     private ?string $corpType = null;
 
     #[ORM\Column(length: 255, nullable: true, options: ['comment' => '授权方企业方形头像'])]
+    #[Assert\Length(max: 255)]
+    #[Assert\Url]
     private ?string $corpSquareLogoUrl = null;
 
     #[ORM\Column(nullable: true, options: ['comment' => '授权方企业用户规模'])]
+    #[Assert\PositiveOrZero]
     private ?int $corpUserMax = null;
 
     #[ORM\Column(length: 200, nullable: true, options: ['comment' => '授权方企业全称'])]
+    #[Assert\Length(max: 200)]
     private ?string $corpFullName = null;
 
     #[ORM\Column(length: 16, nullable: true, options: ['comment' => '企业类型'])]
+    #[Assert\Length(max: 16)]
     private ?string $subjectType = null;
 
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => '企业规模'])]
+    #[Assert\Length(max: 40)]
     private ?string $corpScale = null;
 
     #[ORM\Column(length: 100, nullable: true, options: ['comment' => '企业所属行业'])]
+    #[Assert\Length(max: 100)]
     private ?string $corpIndustry = null;
 
     #[ORM\Column(length: 100, nullable: true, options: ['comment' => '企业所属子行业'])]
+    #[Assert\Length(max: 100)]
     private ?string $corpSubIndustry = null;
 
-    #[ORM\Column(nullable: true, options: ['comment' => '授权信息'])]
+    /**
+     * @var array<mixed>
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '授权信息'])]
+    #[Assert\Type(type: 'array')]
     private array $authInfo = [];
 
-    #[ORM\Column(nullable: true, options: ['comment' => '授权管理员的信息'])]
+    /**
+     * @var array<mixed>
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '授权管理员的信息'])]
+    #[Assert\Type(type: 'array')]
     private array $authUserInfo = [];
 
-    #[ORM\Column(nullable: true, options: ['comment' => '代理服务商企业信息'])]
+    /**
+     * @var array<mixed>
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '代理服务商企业信息'])]
+    #[Assert\Type(type: 'array')]
     private array $dealerCorpInfo = [];
 
-    #[ORM\Column(nullable: true, options: ['comment' => '推广二维码安装相关信息'])]
+    /**
+     * @var array<mixed>
+     */
+    #[ORM\Column(type: Types::JSON, nullable: true, options: ['comment' => '推广二维码安装相关信息'])]
+    #[Assert\Type(type: 'array')]
     private array $registerCodeInfo = [];
 
     #[ORM\Column(length: 100, nullable: true, options: ['comment' => '安装应用时，扫码或者授权链接中带的state值'])]
+    #[Assert\Length(max: 100)]
     private ?string $state = null;
 
     #[ORM\Column(length: 200, nullable: true, options: ['comment' => '企业微信永久授权码'])]
+    #[Assert\Length(max: 200)]
     private ?string $permanentCode = null;
 
     #[ORM\Column(length: 300, nullable: true, options: ['comment' => '授权方（企业）access_token'])]
+    #[Assert\Length(max: 300)]
     private ?string $accessToken = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true, options: ['comment' => '授权方（企业）access_token超时时间'])]
+    #[Assert\Type(type: \DateTimeImmutable::class)]
     private ?\DateTimeImmutable $tokenExpireTime = null;
 
     #[ORM\ManyToOne(inversedBy: 'authCorps')]
     private ?Suite $suite = null;
 
     #[ORM\Column(length: 40, nullable: true, options: ['comment' => '代开发Token'])]
+    #[Assert\Length(max: 40)]
     private ?string $token = null;
 
     #[ORM\Column(length: 120, nullable: true, options: ['comment' => '代开发EncodingAESKey'])]
+    #[Assert\Length(max: 120)]
     private ?string $encodingAesKey = null;
 
-    #[ORM\OneToMany(mappedBy: 'authCorp', targetEntity: CorpServerMessage::class)]
+    /**
+     * @var Collection<int, CorpServerMessage>
+     */
+    #[ORM\OneToMany(targetEntity: CorpServerMessage::class, mappedBy: 'authCorp')]
     private Collection $serverMessages;
 
     public function __construct()
@@ -96,24 +135,21 @@ class AuthCorp implements AccessTokenAware, \Stringable
 
     public function __toString(): string
     {
-        if ($this->getId() === null || $this->getId() === '') {
+        if (null === $this->getId() || '' === $this->getId()) {
             return '';
         }
 
         return "{$this->getCorpName()}";
     }
 
-
     public function getCorpId(): ?string
     {
         return $this->corpId;
     }
 
-    public function setCorpId(string $corpId): self
+    public function setCorpId(string $corpId): void
     {
         $this->corpId = $corpId;
-
-        return $this;
     }
 
     public function getCorpName(): ?string
@@ -121,11 +157,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpName;
     }
 
-    public function setCorpName(string $corpName): self
+    public function setCorpName(string $corpName): void
     {
         $this->corpName = $corpName;
-
-        return $this;
     }
 
     public function getCorpType(): ?string
@@ -133,11 +167,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpType;
     }
 
-    public function setCorpType(?string $corpType): self
+    public function setCorpType(?string $corpType): void
     {
         $this->corpType = $corpType;
-
-        return $this;
     }
 
     public function getCorpSquareLogoUrl(): ?string
@@ -145,11 +177,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpSquareLogoUrl;
     }
 
-    public function setCorpSquareLogoUrl(?string $corpSquareLogoUrl): self
+    public function setCorpSquareLogoUrl(?string $corpSquareLogoUrl): void
     {
         $this->corpSquareLogoUrl = $corpSquareLogoUrl;
-
-        return $this;
     }
 
     public function getCorpUserMax(): ?int
@@ -157,11 +187,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpUserMax;
     }
 
-    public function setCorpUserMax(?int $corpUserMax): self
+    public function setCorpUserMax(?int $corpUserMax): void
     {
         $this->corpUserMax = $corpUserMax;
-
-        return $this;
     }
 
     public function getCorpFullName(): ?string
@@ -169,11 +197,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpFullName;
     }
 
-    public function setCorpFullName(?string $corpFullName): self
+    public function setCorpFullName(?string $corpFullName): void
     {
         $this->corpFullName = $corpFullName;
-
-        return $this;
     }
 
     public function getSubjectType(): ?string
@@ -181,11 +207,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->subjectType;
     }
 
-    public function setSubjectType(?string $subjectType): self
+    public function setSubjectType(?string $subjectType): void
     {
         $this->subjectType = $subjectType;
-
-        return $this;
     }
 
     public function getCorpScale(): ?string
@@ -193,11 +217,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpScale;
     }
 
-    public function setCorpScale(?string $corpScale): self
+    public function setCorpScale(?string $corpScale): void
     {
         $this->corpScale = $corpScale;
-
-        return $this;
     }
 
     public function getCorpIndustry(): ?string
@@ -205,11 +227,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpIndustry;
     }
 
-    public function setCorpIndustry(?string $corpIndustry): self
+    public function setCorpIndustry(?string $corpIndustry): void
     {
         $this->corpIndustry = $corpIndustry;
-
-        return $this;
     }
 
     public function getCorpSubIndustry(): ?string
@@ -217,59 +237,73 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->corpSubIndustry;
     }
 
-    public function setCorpSubIndustry(?string $corpSubIndustry): self
+    public function setCorpSubIndustry(?string $corpSubIndustry): void
     {
         $this->corpSubIndustry = $corpSubIndustry;
-
-        return $this;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getAuthInfo(): array
     {
         return $this->authInfo;
     }
 
-    public function setAuthInfo(?array $authInfo): self
+    /**
+     * @param array<mixed>|null $authInfo
+     */
+    public function setAuthInfo(?array $authInfo): void
     {
         $this->authInfo = $authInfo ?? [];
-
-        return $this;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getAuthUserInfo(): array
     {
         return $this->authUserInfo;
     }
 
-    public function setAuthUserInfo(?array $authUserInfo): self
+    /**
+     * @param array<mixed>|null $authUserInfo
+     */
+    public function setAuthUserInfo(?array $authUserInfo): void
     {
         $this->authUserInfo = $authUserInfo ?? [];
-
-        return $this;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getDealerCorpInfo(): array
     {
         return $this->dealerCorpInfo;
     }
 
-    public function setDealerCorpInfo(?array $dealerCorpInfo): self
+    /**
+     * @param array<mixed>|null $dealerCorpInfo
+     */
+    public function setDealerCorpInfo(?array $dealerCorpInfo): void
     {
         $this->dealerCorpInfo = $dealerCorpInfo ?? [];
-
-        return $this;
     }
 
+    /**
+     * @return array<mixed>
+     */
     public function getRegisterCodeInfo(): array
     {
         return $this->registerCodeInfo;
     }
 
-    public function setRegisterCodeInfo(?array $registerCodeInfo): self
+    /**
+     * @param array<mixed>|null $registerCodeInfo
+     */
+    public function setRegisterCodeInfo(?array $registerCodeInfo): void
     {
         $this->registerCodeInfo = $registerCodeInfo ?? [];
-
-        return $this;
     }
 
     public function getState(): ?string
@@ -277,11 +311,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->state;
     }
 
-    public function setState(?string $state): self
+    public function setState(?string $state): void
     {
         $this->state = $state;
-
-        return $this;
     }
 
     public function getPermanentCode(): ?string
@@ -289,11 +321,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->permanentCode;
     }
 
-    public function setPermanentCode(?string $permanentCode): self
+    public function setPermanentCode(?string $permanentCode): void
     {
         $this->permanentCode = $permanentCode;
-
-        return $this;
     }
 
     public function getAccessToken(): ?string
@@ -301,11 +331,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->accessToken;
     }
 
-    public function setAccessToken(?string $accessToken): self
+    public function setAccessToken(?string $accessToken): void
     {
         $this->accessToken = $accessToken;
-
-        return $this;
     }
 
     public function getTokenExpireTime(): ?\DateTimeImmutable
@@ -313,11 +341,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->tokenExpireTime;
     }
 
-    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): self
+    public function setTokenExpireTime(?\DateTimeImmutable $tokenExpireTime): void
     {
         $this->tokenExpireTime = $tokenExpireTime;
-
-        return $this;
     }
 
     public function getSuite(): ?Suite
@@ -325,11 +351,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->suite;
     }
 
-    public function setSuite(?Suite $suite): self
+    public function setSuite(?Suite $suite): void
     {
         $this->suite = $suite;
-
-        return $this;
     }
 
     public function getToken(): ?string
@@ -337,11 +361,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->token;
     }
 
-    public function setToken(?string $token): static
+    public function setToken(?string $token): void
     {
         $this->token = $token;
-
-        return $this;
     }
 
     public function getEncodingAesKey(): ?string
@@ -349,11 +371,9 @@ class AuthCorp implements AccessTokenAware, \Stringable
         return $this->encodingAesKey;
     }
 
-    public function setEncodingAesKey(?string $encodingAesKey): static
+    public function setEncodingAesKey(?string $encodingAesKey): void
     {
         $this->encodingAesKey = $encodingAesKey;
-
-        return $this;
     }
 
     /**
@@ -384,4 +404,5 @@ class AuthCorp implements AccessTokenAware, \Stringable
         }
 
         return $this;
-    }}
+    }
+}

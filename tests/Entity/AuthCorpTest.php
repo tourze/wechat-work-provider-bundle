@@ -2,323 +2,368 @@
 
 namespace WechatWorkProviderBundle\Tests\Entity;
 
+use PHPUnit\Framework\Attributes\CoversClass;
 use PHPUnit\Framework\TestCase;
+use Tourze\PHPUnitDoctrineEntity\AbstractEntityTestCase;
 use WechatWorkBundle\Entity\AccessTokenAware;
 use WechatWorkProviderBundle\Entity\AuthCorp;
 use WechatWorkProviderBundle\Entity\CorpServerMessage;
 use WechatWorkProviderBundle\Entity\Suite;
 
-class AuthCorpTest extends TestCase
+/**
+ * @internal
+ */
+#[CoversClass(AuthCorp::class)]
+final class AuthCorpTest extends AbstractEntityTestCase
 {
-    private AuthCorp $authCorp;
-
-    protected function setUp(): void
+    protected function createEntity(): object
     {
-        $this->authCorp = new AuthCorp();
+        return new AuthCorp();
+    }
+
+    /**
+     * @return iterable<array{string, mixed}>
+     */
+    public static function propertiesProvider(): iterable
+    {
+        return [
+            'authInfo' => ['authInfo', ['key' => 'value']],
+            'authUserInfo' => ['authUserInfo', ['key' => 'value']],
+            'dealerCorpInfo' => ['dealerCorpInfo', ['key' => 'value']],
+            'registerCodeInfo' => ['registerCodeInfo', ['key' => 'value']],
+        ];
     }
 
     public function testAuthCorpImplementsAccessTokenAware(): void
     {
-        $this->assertInstanceOf(AccessTokenAware::class, $this->authCorp);
+        $authCorp = new AuthCorp();
+        $this->assertInstanceOf(AccessTokenAware::class, $authCorp);
     }
 
     public function testAuthCorpIsStringable(): void
     {
-        $this->assertInstanceOf(\Stringable::class, $this->authCorp);
+        $authCorp = new AuthCorp();
+        $this->assertInstanceOf(\Stringable::class, $authCorp);
     }
 
     public function testToStringWithoutId(): void
     {
-        $result = (string) $this->authCorp;
+        $authCorp = new AuthCorp();
+        $result = (string) $authCorp;
         $this->assertSame('', $result);
     }
 
     public function testToStringWithCorpName(): void
     {
+        $authCorp = new AuthCorp();
         $corpName = '测试企业';
-        $this->authCorp->setCorpName($corpName);
-        
+        $authCorp->setCorpName($corpName);
+
         // 由于没有ID时返回空字符串，我们需要模拟有ID的情况
-        $reflection = new \ReflectionClass($this->authCorp);
+        $reflection = new \ReflectionClass($authCorp);
         $idProperty = $reflection->getProperty('id');
         $idProperty->setAccessible(true);
-        $idProperty->setValue($this->authCorp, '123456789');
-        
-        $result = (string) $this->authCorp;
+        $idProperty->setValue($authCorp, '123456789');
+
+        $result = (string) $authCorp;
         $this->assertSame($corpName, $result);
     }
 
     public function testCorpIdGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $corpId = 'test_corp_id_123';
-        $this->authCorp->setCorpId($corpId);
-        $this->assertSame($corpId, $this->authCorp->getCorpId());
+        $authCorp->setCorpId($corpId);
+        $this->assertSame($corpId, $authCorp->getCorpId());
     }
 
     public function testCorpNameGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $corpName = '测试企业名称';
-        $this->authCorp->setCorpName($corpName);
-        $this->assertSame($corpName, $this->authCorp->getCorpName());
+        $authCorp->setCorpName($corpName);
+        $this->assertSame($corpName, $authCorp->getCorpName());
     }
 
     public function testCorpTypeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $corpType = 'enterprise';
-        $this->authCorp->setCorpType($corpType);
-        $this->assertSame($corpType, $this->authCorp->getCorpType());
-        
+        $authCorp->setCorpType($corpType);
+        $this->assertSame($corpType, $authCorp->getCorpType());
+
         // 测试 null 值
-        $this->authCorp->setCorpType(null);
-        $this->assertNull($this->authCorp->getCorpType());
+        $authCorp->setCorpType(null);
+        $this->assertNull($authCorp->getCorpType());
     }
 
     public function testCorpSquareLogoUrlGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $logoUrl = 'https://example.com/logo.png';
-        $this->authCorp->setCorpSquareLogoUrl($logoUrl);
-        $this->assertSame($logoUrl, $this->authCorp->getCorpSquareLogoUrl());
-        
+        $authCorp->setCorpSquareLogoUrl($logoUrl);
+        $this->assertSame($logoUrl, $authCorp->getCorpSquareLogoUrl());
+
         // 测试 null 值
-        $this->authCorp->setCorpSquareLogoUrl(null);
-        $this->assertNull($this->authCorp->getCorpSquareLogoUrl());
+        $authCorp->setCorpSquareLogoUrl(null);
+        $this->assertNull($authCorp->getCorpSquareLogoUrl());
     }
 
     public function testCorpUserMaxGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $userMax = 1000;
-        $this->authCorp->setCorpUserMax($userMax);
-        $this->assertSame($userMax, $this->authCorp->getCorpUserMax());
-        
+        $authCorp->setCorpUserMax($userMax);
+        $this->assertSame($userMax, $authCorp->getCorpUserMax());
+
         // 测试边界值
-        $this->authCorp->setCorpUserMax(0);
-        $this->assertSame(0, $this->authCorp->getCorpUserMax());
-        
+        $authCorp->setCorpUserMax(0);
+        $this->assertSame(0, $authCorp->getCorpUserMax());
+
         // 测试 null 值
-        $this->authCorp->setCorpUserMax(null);
-        $this->assertNull($this->authCorp->getCorpUserMax());
+        $authCorp->setCorpUserMax(null);
+        $this->assertNull($authCorp->getCorpUserMax());
     }
 
     public function testCorpFullNameGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $fullName = '测试企业有限公司';
-        $this->authCorp->setCorpFullName($fullName);
-        $this->assertSame($fullName, $this->authCorp->getCorpFullName());
+        $authCorp->setCorpFullName($fullName);
+        $this->assertSame($fullName, $authCorp->getCorpFullName());
     }
 
     public function testSubjectTypeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $subjectType = 'enterprise';
-        $this->authCorp->setSubjectType($subjectType);
-        $this->assertSame($subjectType, $this->authCorp->getSubjectType());
+        $authCorp->setSubjectType($subjectType);
+        $this->assertSame($subjectType, $authCorp->getSubjectType());
     }
 
     public function testCorpScaleGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $scale = '100-500人';
-        $this->authCorp->setCorpScale($scale);
-        $this->assertSame($scale, $this->authCorp->getCorpScale());
+        $authCorp->setCorpScale($scale);
+        $this->assertSame($scale, $authCorp->getCorpScale());
     }
 
     public function testCorpIndustryGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $industry = 'IT软件';
-        $this->authCorp->setCorpIndustry($industry);
-        $this->assertSame($industry, $this->authCorp->getCorpIndustry());
+        $authCorp->setCorpIndustry($industry);
+        $this->assertSame($industry, $authCorp->getCorpIndustry());
     }
 
     public function testCorpSubIndustryGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $subIndustry = '软件开发';
-        $this->authCorp->setCorpSubIndustry($subIndustry);
-        $this->assertSame($subIndustry, $this->authCorp->getCorpSubIndustry());
+        $authCorp->setCorpSubIndustry($subIndustry);
+        $this->assertSame($subIndustry, $authCorp->getCorpSubIndustry());
     }
 
     public function testAuthInfoGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $authInfo = [
             'agent' => [
-                ['agentid' => 1000001, 'name' => '测试应用']
-            ]
+                ['agentid' => 1000001, 'name' => '测试应用'],
+            ],
         ];
-        $this->authCorp->setAuthInfo($authInfo);
-        $this->assertSame($authInfo, $this->authCorp->getAuthInfo());
-        
+        $authCorp->setAuthInfo($authInfo);
+        $this->assertSame($authInfo, $authCorp->getAuthInfo());
+
         // 测试 null 值
-        $this->authCorp->setAuthInfo(null);
-        $this->assertSame([], $this->authCorp->getAuthInfo());
+        $authCorp->setAuthInfo(null);
+        $this->assertSame([], $authCorp->getAuthInfo());
     }
 
     public function testAuthUserInfoGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $authUserInfo = [
             'userid' => 'admin',
-            'name' => '管理员'
+            'name' => '管理员',
         ];
-        $this->authCorp->setAuthUserInfo($authUserInfo);
-        $this->assertSame($authUserInfo, $this->authCorp->getAuthUserInfo());
-        
+        $authCorp->setAuthUserInfo($authUserInfo);
+        $this->assertSame($authUserInfo, $authCorp->getAuthUserInfo());
+
         // 测试 null 值
-        $this->authCorp->setAuthUserInfo(null);
-        $this->assertSame([], $this->authCorp->getAuthUserInfo());
+        $authCorp->setAuthUserInfo(null);
+        $this->assertSame([], $authCorp->getAuthUserInfo());
     }
 
     public function testDealerCorpInfoGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $dealerInfo = ['dealer_corp_id' => 'dealer123'];
-        $this->authCorp->setDealerCorpInfo($dealerInfo);
-        $this->assertSame($dealerInfo, $this->authCorp->getDealerCorpInfo());
-        
+        $authCorp->setDealerCorpInfo($dealerInfo);
+        $this->assertSame($dealerInfo, $authCorp->getDealerCorpInfo());
+
         // 测试 null 值
-        $this->authCorp->setDealerCorpInfo(null);
-        $this->assertSame([], $this->authCorp->getDealerCorpInfo());
+        $authCorp->setDealerCorpInfo(null);
+        $this->assertSame([], $authCorp->getDealerCorpInfo());
     }
 
     public function testRegisterCodeInfoGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $registerInfo = ['register_code' => 'reg123'];
-        $this->authCorp->setRegisterCodeInfo($registerInfo);
-        $this->assertSame($registerInfo, $this->authCorp->getRegisterCodeInfo());
-        
+        $authCorp->setRegisterCodeInfo($registerInfo);
+        $this->assertSame($registerInfo, $authCorp->getRegisterCodeInfo());
+
         // 测试 null 值
-        $this->authCorp->setRegisterCodeInfo(null);
-        $this->assertSame([], $this->authCorp->getRegisterCodeInfo());
+        $authCorp->setRegisterCodeInfo(null);
+        $this->assertSame([], $authCorp->getRegisterCodeInfo());
     }
 
     public function testStateGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $state = 'install_state_123';
-        $this->authCorp->setState($state);
-        $this->assertSame($state, $this->authCorp->getState());
+        $authCorp->setState($state);
+        $this->assertSame($state, $authCorp->getState());
     }
 
     public function testPermanentCodeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $permanentCode = 'permanent_code_abc123';
-        $this->authCorp->setPermanentCode($permanentCode);
-        $this->assertSame($permanentCode, $this->authCorp->getPermanentCode());
+        $authCorp->setPermanentCode($permanentCode);
+        $this->assertSame($permanentCode, $authCorp->getPermanentCode());
     }
 
     public function testAccessTokenGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $accessToken = 'access_token_xyz789';
-        $this->authCorp->setAccessToken($accessToken);
-        $this->assertSame($accessToken, $this->authCorp->getAccessToken());
+        $authCorp->setAccessToken($accessToken);
+        $this->assertSame($accessToken, $authCorp->getAccessToken());
     }
 
     public function testTokenExpireTimeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $expireTime = new \DateTimeImmutable('2024-12-31 23:59:59');
-        $this->authCorp->setTokenExpireTime($expireTime);
-        $this->assertSame($expireTime, $this->authCorp->getTokenExpireTime());
-        
+        $authCorp->setTokenExpireTime($expireTime);
+        $this->assertSame($expireTime, $authCorp->getTokenExpireTime());
+
         // 测试 null 值
-        $this->authCorp->setTokenExpireTime(null);
-        $this->assertNull($this->authCorp->getTokenExpireTime());
+        $authCorp->setTokenExpireTime(null);
+        $this->assertNull($authCorp->getTokenExpireTime());
     }
 
     public function testSuiteGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $suite = new Suite();
-        $this->authCorp->setSuite($suite);
-        $this->assertSame($suite, $this->authCorp->getSuite());
-        
+        $authCorp->setSuite($suite);
+        $this->assertSame($suite, $authCorp->getSuite());
+
         // 测试 null 值
-        $this->authCorp->setSuite(null);
-        $this->assertNull($this->authCorp->getSuite());
+        $authCorp->setSuite(null);
+        $this->assertNull($authCorp->getSuite());
     }
 
     public function testTokenGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $token = 'callback_token_123';
-        $this->authCorp->setToken($token);
-        $this->assertSame($token, $this->authCorp->getToken());
+        $authCorp->setToken($token);
+        $this->assertSame($token, $authCorp->getToken());
     }
 
     public function testEncodingAesKeyGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $encodingAesKey = 'encoding_aes_key_abc123def456';
-        $this->authCorp->setEncodingAesKey($encodingAesKey);
-        $this->assertSame($encodingAesKey, $this->authCorp->getEncodingAesKey());
+        $authCorp->setEncodingAesKey($encodingAesKey);
+        $this->assertSame($encodingAesKey, $authCorp->getEncodingAesKey());
     }
 
     public function testServerMessagesCollection(): void
     {
+        $authCorp = new AuthCorp();
         // 测试初始化时集合为空
-        $this->assertCount(0, $this->authCorp->getServerMessages());
-        
+        $this->assertCount(0, $authCorp->getServerMessages());
+
         // 测试添加消息
         $message1 = new CorpServerMessage();
-        $this->authCorp->addServerMessage($message1);
-        $this->assertCount(1, $this->authCorp->getServerMessages());
-        $this->assertTrue($this->authCorp->getServerMessages()->contains($message1));
-        $this->assertSame($this->authCorp, $message1->getAuthCorp());
-        
+        $authCorp->addServerMessage($message1);
+        $this->assertCount(1, $authCorp->getServerMessages());
+        $this->assertTrue($authCorp->getServerMessages()->contains($message1));
+        $this->assertSame($authCorp, $message1->getAuthCorp());
+
         // 测试添加重复消息
-        $this->authCorp->addServerMessage($message1);
-        $this->assertCount(1, $this->authCorp->getServerMessages());
-        
+        $authCorp->addServerMessage($message1);
+        $this->assertCount(1, $authCorp->getServerMessages());
+
         // 测试添加第二个消息
         $message2 = new CorpServerMessage();
-        $this->authCorp->addServerMessage($message2);
-        $this->assertCount(2, $this->authCorp->getServerMessages());
-        
+        $authCorp->addServerMessage($message2);
+        $this->assertCount(2, $authCorp->getServerMessages());
+
         // 测试移除消息
-        $this->authCorp->removeServerMessage($message1);
-        $this->assertCount(1, $this->authCorp->getServerMessages());
-        $this->assertFalse($this->authCorp->getServerMessages()->contains($message1));
+        $authCorp->removeServerMessage($message1);
+        $this->assertCount(1, $authCorp->getServerMessages());
+        $this->assertFalse($authCorp->getServerMessages()->contains($message1));
         $this->assertNull($message1->getAuthCorp());
-        
+
         // 测试移除不存在的消息
         $message3 = new CorpServerMessage();
-        $this->authCorp->removeServerMessage($message3);
-        $this->assertCount(1, $this->authCorp->getServerMessages());
+        $authCorp->removeServerMessage($message3);
+        $this->assertCount(1, $authCorp->getServerMessages());
     }
 
     public function testCreateTimeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $createTime = new \DateTimeImmutable('2024-01-01 10:00:00');
-        $this->authCorp->setCreateTime($createTime);
-        $this->assertSame($createTime, $this->authCorp->getCreateTime());
-        
+        $authCorp->setCreateTime($createTime);
+        $this->assertSame($createTime, $authCorp->getCreateTime());
+
         // 测试 null 值
-        $this->authCorp->setCreateTime(null);
-        $this->assertNull($this->authCorp->getCreateTime());
+        $authCorp->setCreateTime(null);
+        $this->assertNull($authCorp->getCreateTime());
     }
 
     public function testUpdateTimeGetterAndSetter(): void
     {
+        $authCorp = new AuthCorp();
         $updateTime = new \DateTimeImmutable('2024-01-01 10:30:00');
-        $this->authCorp->setUpdateTime($updateTime);
-        $this->assertSame($updateTime, $this->authCorp->getUpdateTime());
-        
+        $authCorp->setUpdateTime($updateTime);
+        $this->assertSame($updateTime, $authCorp->getUpdateTime());
+
         // 测试 null 值
-        $this->authCorp->setUpdateTime(null);
-        $this->assertNull($this->authCorp->getUpdateTime());
+        $authCorp->setUpdateTime(null);
+        $this->assertNull($authCorp->getUpdateTime());
     }
 
     public function testFluentInterface(): void
     {
-        // 测试方法链式调用
-        $result = $this->authCorp
-            ->setCorpId('test_corp')
-            ->setCorpName('测试企业')
-            ->setCorpType('enterprise')
-            ->setAccessToken('token123');
-            
-        $this->assertSame($this->authCorp, $result);
-        $this->assertSame('test_corp', $this->authCorp->getCorpId());
-        $this->assertSame('测试企业', $this->authCorp->getCorpName());
-        $this->assertSame('enterprise', $this->authCorp->getCorpType());
-        $this->assertSame('token123', $this->authCorp->getAccessToken());
+        $authCorp = new AuthCorp();
+        // setter方法已改为void返回，不再支持链式调用
+        $authCorp->setCorpId('test_corp');
+        $authCorp->setCorpName('测试企业');
+        $authCorp->setCorpType('enterprise');
+        $authCorp->setAccessToken('token123');
+
+        $this->assertSame('test_corp', $authCorp->getCorpId());
+        $this->assertSame('测试企业', $authCorp->getCorpName());
+        $this->assertSame('enterprise', $authCorp->getCorpType());
+        $this->assertSame('token123', $authCorp->getAccessToken());
     }
 
     public function testDefaultArrayValues(): void
     {
+        $authCorp = new AuthCorp();
         // 测试默认的数组字段值
-        $this->assertSame([], $this->authCorp->getAuthInfo());
-        $this->assertSame([], $this->authCorp->getAuthUserInfo());
-        $this->assertSame([], $this->authCorp->getDealerCorpInfo());
-        $this->assertSame([], $this->authCorp->getRegisterCodeInfo());
+        $this->assertSame([], $authCorp->getAuthInfo());
+        $this->assertSame([], $authCorp->getAuthUserInfo());
+        $this->assertSame([], $authCorp->getDealerCorpInfo());
+        $this->assertSame([], $authCorp->getRegisterCodeInfo());
     }
-} 
+}

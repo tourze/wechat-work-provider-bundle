@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkProviderBundle\LegacyApi;
 
 /**
@@ -15,8 +17,10 @@ class SHA1
      * @param string $token     票据
      * @param string $timestamp 时间戳
      * @param string $nonce     随机字符串
+     * @param string $encrypt_msg
+     * @return array{0: int, 1: string|null}
      */
-    public function getSHA1($token, $timestamp, $nonce, $encrypt_msg)
+    public function getSHA1(string $token, string $timestamp, string $nonce, string $encrypt_msg): array
     {
         // 排序
         try {

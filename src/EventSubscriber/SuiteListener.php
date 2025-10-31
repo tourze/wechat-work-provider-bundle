@@ -26,15 +26,18 @@ class SuiteListener
         $msg = $message->getContext();
         $InfoType = $msg['InfoType'] ?? null;
 
-        if ('suite_ticket' === $InfoType) {
+        if ('suite_ticket' === $InfoType && isset($msg['SuiteId'], $msg['SuiteTicket'])) {
             $suite = $this->suiteRepository->findOneBy([
                 'suiteId' => $msg['SuiteId'],
             ]);
-            if ($suite !== null) {
-                $suite->setSuiteTicket($msg['SuiteTicket']);
-                $suite->setTicketExpireTime(CarbonImmutable::now()->addMinutes(30));
-                $this->entityManager->persist($suite);
-                $this->entityManager->flush();
+            if (null !== $suite) {
+                $suiteTicket = $msg['SuiteTicket'];
+                if (is_string($suiteTicket)) {
+                    $suite->setSuiteTicket($suiteTicket);
+                    $suite->setTicketExpireTime(CarbonImmutable::now()->addMinutes(30));
+                    $this->entityManager->persist($suite);
+                    $this->entityManager->flush();
+                }
             }
         }
     }

@@ -1,37 +1,94 @@
 <?php
 
+declare(strict_types=1);
+
 namespace WechatWorkProviderBundle\Service;
 
-use Carbon\CarbonImmutable;
 use Doctrine\ORM\EntityManagerInterface;
 use HttpClientBundle\Client\ApiClient;
-use HttpClientBundle\Client\ClientTrait;
-use HttpClientBundle\Exception\HttpClientException;
+use HttpClientBundle\Exception\GeneralHttpClientException;
 use HttpClientBundle\Request\RequestInterface;
+use Monolog\Attribute\WithMonologChannel;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\DependencyInjection\Attribute\Autoconfigure;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Contracts\Cache\CacheInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 use Symfony\Contracts\HttpClient\ResponseInterface;
+use Tourze\DoctrineAsyncInsertBundle\Service\AsyncInsertService;
 use WechatWorkBundle\Entity\Agent;
 use WechatWorkBundle\Entity\Corp;
 use WechatWorkBundle\Repository\AgentRepository;
 use WechatWorkBundle\Repository\CorpRepository;
 use WechatWorkProviderBundle\Entity\AuthCorp;
-use WechatWorkProviderBundle\Exception\AccessTokenException;
-use WechatWorkProviderBundle\Request\GetCorpTokenRequest;
-use WechatWorkProviderBundle\Request\GetProviderTokenRequest;
-use WechatWorkProviderBundle\Request\GetSuiteTokenRequest;
 use WechatWorkProviderBundle\Request\WithAuthCorpRequest;
 use WechatWorkProviderBundle\Request\WithProviderRequest;
 use WechatWorkProviderBundle\Request\WithSuiteRequest;
+use WechatWorkProviderBundle\Service\TokenManager;
 use Yiisoft\Json\Json;
 
-class ProviderService extends ApiClient
+#[Autoconfigure(public: true)]
+#[WithMonologChannel(channel: 'wechat_work_provider')]
+class ProviderService extends ApiClient implements RequestClientInterface
 {
-    use ClientTrait;
+    private ?TokenManager $tokenManager = null;
 
     public function __construct(
+        private readonly LoggerInterface $logger,
         private readonly CorpRepository $corpRepository,
         private readonly AgentRepository $agentRepository,
         private readonly EntityManagerInterface $entityManager,
+        private readonly HttpClientInterface $httpClient,
+        private readonly LockFactory $lockFactory,
+        private readonly CacheInterface $cache,
+        private readonly EventDispatcherInterface $eventDispatcher,
+        private readonly AsyncInsertService $asyncInsertService,
     ) {
+    }
+
+    public function setTokenManager(TokenManager $tokenManager): void
+    {
+        $this->tokenManager = $tokenManager;
+    }
+
+    private function getTokenManager(): TokenManager
+    {
+        if (null === $this->tokenManager) {
+            $this->tokenManager = new TokenManager($this->logger, $this->entityManager, $this);
+        }
+
+        return $this->tokenManager;
+    }
+
+    protected function getLockFactory(): LockFactory
+    {
+        return $this->lockFactory;
+    }
+
+    protected function getHttpClient(): HttpClientInterface
+    {
+        return $this->httpClient;
+    }
+
+    protected function getLogger(): LoggerInterface
+    {
+        return $this->logger;
+    }
+
+    protected function getCache(): CacheInterface
+    {
+        return $this->cache;
+    }
+
+    protected function getEventDispatcher(): EventDispatcherInterface
+    {
+        return $this->eventDispatcher;
+    }
+
+    protected function getAsyncInsertService(): AsyncInsertService
+    {
+        return $this->asyncInsertService;
     }
 
     public function getBaseUrl(): string
@@ -40,47 +97,135 @@ class ProviderService extends ApiClient
     }
 
     /**
+     * 优先使用Request中定义的地址
+     */
+    protected function getRequestUrl(RequestInterface $request): string
+    {
+        $path = ltrim($request->getRequestPath(), '/');
+        if (str_starts_with($path, 'https://')) {
+            return $path;
+        }
+        if (str_starts_with($path, 'http://')) {
+            return $path;
+        }
+
+        $domain = trim($this->getBaseUrl());
+        if ('' === $domain) {
+            throw new \RuntimeException(self::class . '缺少getBaseUrl的定义');
+        }
+
+        return "{$domain}/{$path}";
+    }
+
+    /**
      * 把授权的企业微信信息，同步一份到企业微信模块
      */
     public function syncAuthCorpToCorpAndAgent(AuthCorp $authCorp): Corp
     {
+        $corp = $this->findOrCreateCorp($authCorp);
+        $this->syncAgents($authCorp, $corp);
+
+        return $corp;
+    }
+
+    private function findOrCreateCorp(AuthCorp $authCorp): Corp
+    {
         $corp = $this->corpRepository->findOneBy([
             'corpId' => $authCorp->getCorpId(),
         ]);
-        if ($corp === null) {
+
+        if (null === $corp) {
             $corp = new Corp();
-            $corp->setCorpId($authCorp->getCorpId());
+            $corpId = $authCorp->getCorpId();
+            if (null !== $corpId) {
+                $corp->setCorpId($corpId);
+            }
         }
+
         $corp->setFromProvider(true);
 
-        $corp->setName($authCorp->getCorpName());
+        $corpName = $authCorp->getCorpName();
+        if (null !== $corpName) {
+            $corp->setName($corpName);
+        }
+
         $this->entityManager->persist($corp);
         $this->entityManager->flush();
 
-        // 添加应用信息
-        $agents = $authCorp->getAuthInfo();
-        if (isset($agents['agent'])) {
-            $agents = $agents['agent'];
-        }
-        foreach ($agents as $item) {
-            $agent = $this->agentRepository->findOneBy([
-                'corp' => $corp,
-                'agentId' => $item['agentid'],
-            ]);
-            if ($agent === null) {
-                $agent = new Agent();
-                $agent->setCorp($corp);
-                $agent->setAgentId($item['agentid']);
-            }
-            $agent->setName($item['name']);
-            $agent->setSquareLogoUrl($item['square_logo_url']);
-            $agent->setAccessToken($authCorp->getAccessToken());
-            $agent->setAccessTokenExpireTime($authCorp->getTokenExpireTime());
-            $this->entityManager->persist($agent);
-            $this->entityManager->flush();
+        return $corp;
+    }
+
+    private function syncAgents(AuthCorp $authCorp, Corp $corp): void
+    {
+        $authInfo = $authCorp->getAuthInfo();
+
+        $agents = $authInfo['agent'] ?? $authInfo;
+        if (!is_array($agents)) {
+            return;
         }
 
-        return $corp;
+        foreach ($agents as $item) {
+            $this->syncAgent($item, $corp, $authCorp);
+        }
+    }
+
+    /**
+     * @param mixed $item
+     */
+    private function syncAgent($item, Corp $corp, AuthCorp $authCorp): void
+    {
+        if (!is_array($item) || !isset($item['agentid'], $item['name'])) {
+            return;
+        }
+
+        $agentId = $item['agentid'];
+        if (!is_string($agentId)) {
+            return;
+        }
+
+        $agent = $this->agentRepository->findOneBy([
+            'corp' => $corp,
+            'agentId' => $agentId,
+        ]);
+
+        if (null === $agent) {
+            $agent = new Agent();
+            $agent->setCorp($corp);
+            $agent->setAgentId($agentId);
+        }
+
+        // 确保数组键都是字符串类型
+        $normalizedItem = [];
+        foreach ($item as $key => $value) {
+            if (is_string($key)) {
+                $normalizedItem[$key] = $value;
+            }
+        }
+
+        /** @var array<string, mixed> $normalizedItem */
+        $this->populateAgentData($agent, $normalizedItem, $authCorp);
+
+        $this->entityManager->persist($agent);
+        $this->entityManager->flush();
+    }
+
+    /**
+     * @param array<string, mixed> $item
+     */
+    private function populateAgentData(Agent $agent, array $item, AuthCorp $authCorp): void
+    {
+        $name = $item['name'];
+        if (is_string($name)) {
+            $agent->setName($name);
+        }
+
+        $squareLogoUrl = $item['square_logo_url'] ?? null;
+        if (is_string($squareLogoUrl)) {
+            $agent->setSquareLogoUrl($squareLogoUrl);
+        }
+
+        $agent->setAccessToken($authCorp->getAccessToken());
+        $agent->setAccessTokenExpireTime($authCorp->getTokenExpireTime());
     }
 
     protected function getRequestMethod(RequestInterface $request): string
@@ -88,95 +233,30 @@ class ProviderService extends ApiClient
         return $request->getRequestMethod() ?? 'POST';
     }
 
-    protected function getRequestOptions(RequestInterface $request): ?array
+    /**
+     * @return array<string, mixed>
+     */
+    protected function getRequestOptions(RequestInterface $request): array
     {
+        /** @var array<string, mixed> $options */
         $options = $request->getRequestOptions();
-        if (!isset($options['query'])) {
+        if (!is_array($options)) {
+            $options = [];
+        }
+        if (!isset($options['query']) || !is_array($options['query'])) {
             $options['query'] = [];
         }
 
         if ($request instanceof WithSuiteRequest) {
-            $suite = $request->getSuite();
-            $now = CarbonImmutable::now();
-
-            if ($suite->getTokenExpireTime() === null) {
-                $suite->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
-            }
-            if ($suite->getSuiteAccessToken() !== null && $suite->getSuiteAccessToken() !== '' && $now->greaterThan($suite->getTokenExpireTime())) {
-                $suite->setSuiteAccessToken('');
-            }
-
-            if ($suite->getSuiteAccessToken() === null || $suite->getSuiteAccessToken() === '') {
-                $tokenRequest = new GetSuiteTokenRequest();
-                $tokenRequest->setSuiteId($suite->getSuiteId());
-                $tokenRequest->setSuiteSecret($suite->getSuiteSecret());
-                $tokenRequest->setSuiteTicket($suite->getSuiteTicket());
-                $tokenResponse = $this->request($tokenRequest);
-                $suite->setSuiteAccessToken($tokenResponse['suite_access_token']);
-                $suite->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
-                $this->entityManager->persist($suite);
-                $this->entityManager->flush();
-            }
-
-            $options['query']['suite_access_token'] = $suite->getSuiteAccessToken();
+            $options['query']['suite_access_token'] = $this->getTokenManager()->ensureSuiteAccessToken($request->getSuite());
         }
 
         if ($request instanceof WithAuthCorpRequest) {
-            $authCorp = $request->getAuthCorp();
-            $now = CarbonImmutable::now();
-
-            if ($authCorp->getTokenExpireTime() === null) {
-                $authCorp->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
-            }
-            if ($authCorp->getAccessToken() !== null && $authCorp->getAccessToken() !== '' && $now->greaterThan($authCorp->getTokenExpireTime())) {
-                $authCorp->setAccessToken('');
-            }
-
-            if ($authCorp->getAccessToken() === null || $authCorp->getAccessToken() === '') {
-                $tokenRequest = new GetCorpTokenRequest();
-                $tokenRequest->setAuthCorpId($authCorp->getCorpId());
-                $tokenRequest->setPermanentCode($authCorp->getPermanentCode());
-                $tokenResponse = $this->request($tokenRequest);
-                if (!isset($tokenResponse['access_token'])) {
-                    $this->apiClientLogger?->error('access_token结果异常', [
-                        'authCorp' => $authCorp,
-                        'tokenResponse' => $tokenResponse,
-                    ]);
-                    throw new AccessTokenException('无法获取应用AccessToken');
-                }
-
-                $authCorp->setAccessToken($tokenResponse['access_token']);
-                $authCorp->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
-                $this->entityManager->persist($authCorp);
-                $this->entityManager->flush();
-            }
-
-            $options['query']['access_token'] = $authCorp->getAccessToken();
+            $options['query']['access_token'] = $this->getTokenManager()->ensureAuthCorpAccessToken($request->getAuthCorp());
         }
 
         if ($request instanceof WithProviderRequest) {
-            $provider = $request->getProvider();
-            $now = CarbonImmutable::now();
-
-            if ($provider->getTokenExpireTime() === null) {
-                $provider->setTokenExpireTime(CarbonImmutable::now()->lastOfYear());
-            }
-            if ($provider->getProviderAccessToken() !== null && $provider->getProviderAccessToken() !== '' && $now->greaterThanOrEqualTo($provider->getTokenExpireTime())) {
-                $provider->setProviderAccessToken('');
-            }
-
-            if ($provider->getProviderAccessToken() === null || $provider->getProviderAccessToken() === '') {
-                $tokenRequest = new GetProviderTokenRequest();
-                $tokenRequest->setCorpId($provider->getCorpId());
-                $tokenRequest->setProviderSecret($provider->getProviderSecret());
-                $tokenResponse = $this->request($tokenRequest);
-                $provider->setProviderAccessToken($tokenResponse['provider_access_token']);
-                $provider->setTokenExpireTime(CarbonImmutable::now()->addSeconds($tokenResponse['expires_in']));
-                $this->entityManager->persist($provider);
-                $this->entityManager->flush();
-            }
-
-            $options['query']['provider_access_token'] = $provider->getProviderAccessToken();
+            $options['query']['provider_access_token'] = $this->getTokenManager()->ensureProviderAccessToken($request->getProvider());
         }
 
         return $options;
@@ -187,9 +267,12 @@ class ProviderService extends ApiClient
         $json = $response->getContent();
         $json = Json::decode($json);
 
-        if (isset($json['errcode'])) {
-            if (0 !== $json['errcode']) {
-                throw new HttpClientException($request, $response, $json['errmsg'], $json['errcode']);
+        if (is_array($json) && isset($json['errcode'])) {
+            $errcode = $json['errcode'];
+            if (is_int($errcode) && 0 !== $errcode) {
+                $errmsg = $json['errmsg'] ?? '未知错误';
+                $errorMessage = is_string($errmsg) ? $errmsg : '未知错误';
+                throw new GeneralHttpClientException($request, $response, $errorMessage, $errcode);
             }
         }
 

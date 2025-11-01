@@ -2,7 +2,7 @@
 
 namespace WechatWorkProviderBundle\Tests\Request;
 
-use HttpClientBundle\Tests\Request\RequestTestCase;
+use HttpClientBundle\Test\RequestTestCase;
 use PHPUnit\Framework\Attributes\CoversClass;
 use WechatWorkProviderBundle\Request\WithAuthCorpRequest;
 

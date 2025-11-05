@@ -45,8 +45,8 @@
     "tourze/symfony-cron-job-bundle": "1.0.*",
     "tourze/symfony-dependency-service-loader": "1.0.*",
     "tourze/symfony-routing-auto-loader-bundle": "1.0.*",
-    "tourze/wechat-work-bundle": "0.1.*",
-    "tourze/wechat-work-contracts": "0.0.*",
+    "tourze/wechat-work-bundle": "1.0.*",
+    "tourze/wechat-work-contracts": "1.0.*",
     "tourze/wechat-work-server-bundle": "0.0.*",
     "yiisoft/json": "^1.0"
   },

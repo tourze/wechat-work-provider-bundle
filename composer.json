@@ -47,7 +47,7 @@
     "tourze/symfony-routing-auto-loader-bundle": "1.0.*",
     "tourze/wechat-work-bundle": "1.1.*",
     "tourze/wechat-work-contracts": "1.0.*",
-    "tourze/wechat-work-server-bundle": "0.0.*",
+    "tourze/wechat-work-server-bundle": "0.1.*",
     "yiisoft/json": "^1.0"
   },
   "require-dev": {

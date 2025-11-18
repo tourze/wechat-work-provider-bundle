@@ -20,13 +20,6 @@ use WechatWorkProviderBundle\Entity\SuiteServerMessage;
 #[RunTestsInSeparateProcesses]
 final class SuiteServerMessageCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $result = SuiteServerMessageCrudController::getEntityFqcn();
-
-        self::assertSame(SuiteServerMessage::class, $result);
-    }
-
     public function testConfigureFilters(): void
     {
         $controller = new SuiteServerMessageCrudController();

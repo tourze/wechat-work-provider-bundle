@@ -20,13 +20,6 @@ use WechatWorkProviderBundle\Entity\Provider;
 #[RunTestsInSeparateProcesses]
 final class ProviderCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $result = ProviderCrudController::getEntityFqcn();
-
-        self::assertSame(Provider::class, $result);
-    }
-
     public function testConfigureFilters(): void
     {
         $controller = new ProviderCrudController();

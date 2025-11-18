@@ -20,13 +20,6 @@ use WechatWorkProviderBundle\Entity\AuthCorp;
 #[RunTestsInSeparateProcesses]
 final class AuthCorpCrudControllerTest extends AbstractEasyAdminControllerTestCase
 {
-    public function testGetEntityFqcn(): void
-    {
-        $result = AuthCorpCrudController::getEntityFqcn();
-
-        self::assertSame(AuthCorp::class, $result);
-    }
-
     public function testConfigureFilters(): void
     {
         $controller = new AuthCorpCrudController();

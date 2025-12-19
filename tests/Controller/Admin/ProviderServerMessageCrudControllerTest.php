@@ -23,10 +23,9 @@ final class ProviderServerMessageCrudControllerTest extends AbstractEasyAdminCon
     public function testConfigureFilters(): void
     {
         $controller = new ProviderServerMessageCrudController();
-        $controller->configureFilters(Filters::new());
+        $result = $controller->configureFilters(Filters::new());
 
-        // 测试方法调用成功
-        $this->expectNotToPerformAssertions();
+        self::assertInstanceOf(Filters::class, $result);
     }
 
     public function testConfigureFields(): void
@@ -43,10 +42,9 @@ final class ProviderServerMessageCrudControllerTest extends AbstractEasyAdminCon
     public function testConfigureCrud(): void
     {
         $controller = new ProviderServerMessageCrudController();
-        $controller->configureCrud(Crud::new());
+        $result = $controller->configureCrud(Crud::new());
 
-        // 测试方法调用成功
-        $this->expectNotToPerformAssertions();
+        self::assertInstanceOf(Crud::class, $result);
     }
 
     /**
